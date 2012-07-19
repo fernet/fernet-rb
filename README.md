@@ -4,7 +4,9 @@ Fernet allows you to easily generate and verify HMAC based authentication tokens
 
 ![Fernet](http://f.cl.ly/items/2d0P3d26271O3p2v253u/photo.JPG)
 
+Fernet is usually served as a *digestif* after a meal but may also be served with coffee and espresso or mixed into coffee and espresso drinks.
 
+Fernet about it!
 
 ## Installation
 
@@ -22,7 +24,7 @@ Or install it yourself as:
 
 ## Usage
 
-For now, see spec/fernet_spec.rb.
+For now, see [spec/fernet_spec.rb](https://github.com/hgimenez/fernet/blob/master/spec/fernet_spec.rb).
 
 I'll flesh this out further soon. Sorry.
 
