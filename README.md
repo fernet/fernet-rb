@@ -1,6 +1,10 @@
 # Fernet
 
-TODO: Write a gem description
+Fernet allows you to easily generate and verify HMAC based authentication tokens for issuing API requests between remote servers.
+
+![Fernet](http://f.cl.ly/items/2d0P3d26271O3p2v253u/photo.JPG)
+
+
 
 ## Installation
 
@@ -18,12 +22,11 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+For now, see spec/fernet_spec.rb.
 
-## Contributing
+I'll flesh this out further soon. Sorry.
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+## License
+
+Valcro is copyright (c) Harold Giménez and is released under the terms of the
+MIT License found in the LICENSE file.
