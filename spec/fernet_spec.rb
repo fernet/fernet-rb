@@ -47,4 +47,12 @@ describe Fernet do
       verifier.seconds_valid = 0
     end.should be_false
   end
+
+  it 'verifies without a custom verification' do
+    token = Fernet.generate(secret) do |generator|
+      generator.data = token_data
+    end
+
+    Fernet.verify(secret, token).should be_true
+  end
 end

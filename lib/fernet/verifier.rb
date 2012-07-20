@@ -17,7 +17,11 @@ module Fernet
       @token = token
       deconstruct
 
-      custom_verification = yield self
+      if block_given?
+        custom_verification = yield self
+      else
+        custom_verification = true
+      end
 
       signatures_match? && token_recent_enough? && custom_verification
     end
