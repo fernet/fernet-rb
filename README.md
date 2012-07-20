@@ -54,5 +54,5 @@ The specs ([spec/fernet_spec.rb](https://github.com/hgimenez/fernet/blob/master/
 
 ## License
 
-Valcro is copyright (c) Harold Giménez and is released under the terms of the
+Fernet is copyright (c) Harold Giménez and is released under the terms of the
 MIT License found in the LICENSE file.
