@@ -35,7 +35,11 @@ module Fernet
     end
 
     def signatures_match?
-      @regenerated_mac == @received_signature
+      regenerated_bytes = @regenerated_mac.bytes.to_a
+      received_bytes    = @received_signature.bytes.to_a
+      received_bytes.inject(0) do |accum, byte|
+        accum |= byte ^ regenerated_bytes.shift
+      end.zero?
     end
   end
 end
