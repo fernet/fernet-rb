@@ -33,8 +33,7 @@ token = Fernet.generate(secret) do |generator|
   generator.data = { email: 'harold@heroku.com' }
 end
 ```
-
-On the server side, the receiver can use this token to verify wether it's legit:
+On the server side, the receiver can use this token to verify whether it's legit:
 
 ```ruby
 verified = Fernet.verify(secret, token) do |verifier|
