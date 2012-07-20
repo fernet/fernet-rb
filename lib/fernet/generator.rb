@@ -5,7 +5,6 @@ require 'date'
 
 module Fernet
   class Generator
-    attr_reader :secret
     attr_accessor :data
 
     def initialize(secret)
@@ -20,5 +19,12 @@ module Fernet
       Base64.urlsafe_encode64(JSON.dump(data.merge(signature: mac)))
     end
 
+    def inspect
+      "#<Fernet::Generator @secret=[masked] @data=#{@data.inspect}>"
+    end
+    alias to_s inspect
+
+  private
+    attr_reader :secret
   end
 end

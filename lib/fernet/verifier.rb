@@ -6,11 +6,11 @@ require 'date'
 module Fernet
   class Verifier
 
-    attr_reader :secret, :token, :data
+    attr_reader :token, :data
     attr_writer :seconds_valid
 
     def initialize(secret)
-      @secret        = secret
+      @secret = secret
     end
 
     def verify_token(token)
@@ -22,7 +22,13 @@ module Fernet
       signatures_match? && token_recent_enough? && custom_verification
     end
 
-    private
+    def inspect
+      "#<Fernet::Verifier @secret=[masked] @token=#{@token} @data=#{@data.inspect} @seconds_valid=#{@seconds_valid}>"
+    end
+    alias to_s inspect
+
+  private
+    attr_reader :secret
 
     def deconstruct
       @data               = JSON.parse(Base64.decode64(token))
