@@ -1,10 +1,12 @@
 # Fernet
 
-Fernet allows you to easily generate and verify HMAC based authentication tokens for issuing API requests between remote servers.
+Fernet allows you to easily generate and verify HMAC based authentication
+tokens for issuing API requests between remote servers.
 
 ![Fernet](http://f.cl.ly/items/2d0P3d26271O3p2v253u/photo.JPG)
 
-Fernet is usually served as a *digestif* after a meal but may also be served with coffee and espresso or mixed into coffee and espresso drinks.
+Fernet is usually served as a *digestif* after a meal but may also be served
+with coffee and espresso or mixed into coffee and espresso drinks.
 
 Fernet about it!
 
@@ -26,14 +28,16 @@ Or install it yourself as:
 
 Both server and client must share a secret.
 
-You want to encode some data in the token as well, for example, an email address can be used to verify it on the other end.
+You want to encode some data in the token as well, for example, an email
+address can be used to verify it on the other end.
 
 ```ruby
 token = Fernet.generate(secret) do |generator|
   generator.data = { email: 'harold@heroku.com' }
 end
 ```
-On the server side, the receiver can use this token to verify whether it's legit:
+On the server side, the receiver can use this token to verify whether it's
+legit:
 
 ```ruby
 verified = Fernet.verify(secret, token) do |verifier|
@@ -47,13 +51,20 @@ The `verified` variable will be true if:
 * The token was generated in the last 60 seconds
 * The secret used to generate the token matches
 
-Otherwise, `verified` will be false, and you should deny the request with an HTTP 401, for example.
+Otherwise, `verified` will be false, and you should deny the request with an
+HTTP 401, for example.
 
-The specs ([spec/fernet_spec.rb](https://github.com/hgimenez/fernet/blob/master/spec/fernet_spec.rb)) have more usage examples.
+The specs
+([spec/fernet_spec.rb](https://github.com/hgimenez/fernet/blob/master/spec/fernet_spec.rb))
+have more usage examples.
 
 ### Attribution
 
-This library was largely made possible by [Mr. Tom Maher](http://twitter.com/#tmaher), who clearly articulated the mechanics behind this process, and further found ways to make it [more](https://github.com/hgimenez/fernet/commit/2bf0b4a66b49ef3fc92ef50708a2c8b401950fc2) [secure](https://github.com/hgimenez/fernet/commit/051161d0afb0b41480734d84bc824bdbc7f9c563).
+This library was largely made possible by [Mr. Tom
+Maher](http://twitter.com/#tmaher), who clearly articulated the mechanics
+behind this process, and further found ways to make it
+[more](https://github.com/hgimenez/fernet/commit/2bf0b4a66b49ef3fc92ef50708a2c8b401950fc2)
+[secure](https://github.com/hgimenez/fernet/commit/051161d0afb0b41480734d84bc824bdbc7f9c563).
 
 ## License
 
