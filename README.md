@@ -58,6 +58,13 @@ The specs
 ([spec/fernet_spec.rb](https://github.com/hgimenez/fernet/blob/master/spec/fernet_spec.rb))
 have more usage examples.
 
+### Generating a secret
+
+Generating appropriate secrets is beyond the scope of `Fernet`, but you should generate it
+using `/dev/random` in a *nix. To generate a base64-encoded 12 byte random sequence, try:
+
+    dd if=/dev/urandom bs=12 count=1 2>/dev/null | openssl base64
+
 ### Attribution
 
 This library was largely made possible by [Mr. Tom
