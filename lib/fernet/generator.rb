@@ -12,7 +12,7 @@ module Fernet
     end
 
     def generate
-      yield self
+      yield self if block_given?
       data.merge!(issued_at: DateTime.now)
 
       mac = OpenSSL::HMAC.hexdigest('sha256', JSON.dump(data), secret)
@@ -23,6 +23,10 @@ module Fernet
       "#<Fernet::Generator @secret=[masked] @data=#{@data.inspect}>"
     end
     alias to_s inspect
+
+    def data
+      @data ||= {}
+    end
 
   private
     attr_reader :secret

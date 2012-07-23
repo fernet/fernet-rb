@@ -55,4 +55,10 @@ describe Fernet do
 
     Fernet.verify(secret, token).should be_true
   end
+
+  it 'generates without custom data' do
+    token = Fernet.generate(secret)
+
+    Fernet.verify(secret, token).should be_true
+  end
 end
