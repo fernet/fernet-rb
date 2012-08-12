@@ -55,7 +55,7 @@ Otherwise, `verified` will be false, and you should deny the request with an
 HTTP 401, for example.
 
 The specs
-([spec/fernet_spec.rb](https://github.com/hgimenez/fernet/blob/master/spec/fernet_spec.rb))
+([spec/fernet_spec.rb](https://github.com/hgmnz/fernet/blob/master/spec/fernet_spec.rb))
 have more usage examples.
 
 ### Generating a secret
@@ -70,8 +70,8 @@ using `/dev/random` in a *nix. To generate a base64-encoded 12 byte random seque
 This library was largely made possible by [Mr. Tom
 Maher](http://twitter.com/#tmaher), who clearly articulated the mechanics
 behind this process, and further found ways to make it
-[more](https://github.com/hgimenez/fernet/commit/2bf0b4a66b49ef3fc92ef50708a2c8b401950fc2)
-[secure](https://github.com/hgimenez/fernet/commit/051161d0afb0b41480734d84bc824bdbc7f9c563).
+[more](https://github.com/hgmnz/fernet/commit/2bf0b4a66b49ef3fc92ef50708a2c8b401950fc2)
+[secure](https://github.com/hgmnz/fernet/commit/051161d0afb0b41480734d84bc824bdbc7f9c563).
 
 ## License
 
