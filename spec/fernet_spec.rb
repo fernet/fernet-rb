@@ -6,7 +6,8 @@ describe Fernet do
     { email: 'harold@heroku.com', id: '123', arbitrary: 'data' }
   end
 
-  let(:secret) { 'sekrit123' }
+  let(:secret) { 'JrdICDH6x3M7duQeM8dJEMK4Y5TkBIsYDw1lPy35RiY=' }
+  let(:bad_secret) { 'jrdICDH6x3M7duQeM8dJEMK4Y5TkBIsYDw1lPy35RiY=' }
 
   it 'can verify tokens it generates' do
     token = Fernet.generate(secret) do |generator|
@@ -23,7 +24,7 @@ describe Fernet do
       generator.data = token_data
     end
 
-    Fernet.verify('bad', token) do |verifier|
+    Fernet.verify(bad_secret, token) do |verifier|
       verifier.data['email'] == 'harold@heroku.com'
     end.should be_false
   end
@@ -33,7 +34,7 @@ describe Fernet do
       generator.data = token_data
     end
 
-    Fernet.verify('bad', token) do |verifier|
+    Fernet.verify(bad_secret, token) do |verifier|
       verifier.data['email'] == 'harold@gmail.com'
     end.should be_false
   end
@@ -43,7 +44,7 @@ describe Fernet do
       generator.data = token_data
     end
 
-    Fernet.verify('bad', token) do |verifier|
+    Fernet.verify(bad_secret, token) do |verifier|
       verifier.seconds_valid = 0
     end.should be_false
   end
@@ -61,4 +62,31 @@ describe Fernet do
 
     Fernet.verify(secret, token).should be_true
   end
+
+  it 'can encrypt the payload' do
+    token = Fernet.generate(secret, true) do |generator|
+      generator.data['password'] = 'password1'
+    end
+
+    payload = Base64.decode64(token)
+    payload.should_not match /password1/
+
+    Fernet.verify(secret, token) do |verifier|
+      verifier.data['password'].should == 'password1'
+    end
+  end
+
+  it 'does not encrypt when asked nicely' do
+    token = Fernet.generate(secret, false) do |generator|
+      generator.data['password'] = 'password1'
+    end
+
+    payload = Base64.decode64(token)
+    payload.should match /password1/
+
+    Fernet.verify(secret, token, false) do |verifier|
+      verifier.data['password'].should == 'password1'
+    end
+  end
+
 end

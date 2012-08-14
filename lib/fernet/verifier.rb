@@ -5,12 +5,12 @@ require 'date'
 
 module Fernet
   class Verifier
-
     attr_reader :token, :data
     attr_writer :seconds_valid
 
-    def initialize(secret)
-      @secret = secret
+    def initialize(secret, decrypt)
+      @secret  = Secret.new(secret, decrypt)
+      @decrypt = decrypt
     end
 
     def verify_token(token)
@@ -35,9 +35,17 @@ module Fernet
     attr_reader :secret
 
     def deconstruct
-      @data               = JSON.parse(Base64.decode64(token))
-      @received_signature = @data.delete('signature')
-      @regenerated_mac    = OpenSSL::HMAC.hexdigest('sha256', JSON.dump(@data), secret)
+      parts = @token.split('|')
+      if decrypt?
+        encrypted_data, iv, @received_signature = *parts
+        @data = JSON.parse(decrypt!(encrypted_data, Base64.urlsafe_decode64(iv)))
+        signing_blob = "#{encrypted_data}|#{iv}"
+      else
+        encoded_data, @received_signature = *parts
+        signing_blob = encoded_data
+        @data = JSON.parse(Base64.urlsafe_decode64(encoded_data))
+      end
+      @regenerated_mac = OpenSSL::HMAC.hexdigest('sha256', signing_blob, signing_key)
     end
 
     def token_recent_enough?
@@ -51,5 +59,26 @@ module Fernet
         accum |= byte ^ regenerated_bytes.shift
       end.zero?
     end
+
+    def decrypt!(encrypted_data, iv)
+      decipher = OpenSSL::Cipher.new('AES-128-CBC')
+      decipher.decrypt
+      decipher.iv  = iv
+      decipher.key = encryption_key
+      decipher.update(Base64.urlsafe_decode64(encrypted_data)) + decipher.final
+    end
+
+    def encryption_key
+      @secret.encryption_key
+    end
+
+    def signing_key
+      @secret.signing_key
+    end
+
+    def decrypt?
+      @decrypt
+    end
+
   end
 end
