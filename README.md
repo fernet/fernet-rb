@@ -60,10 +60,11 @@ have more usage examples.
 
 ### Generating a secret
 
-Generating appropriate secrets is beyond the scope of `Fernet`, but you should generate it
-using `/dev/random` in a *nix. To generate a base64-encoded 12 byte random sequence, try:
+Generating appropriate secrets is beyond the scope of `Fernet`, but you should
+generate it using `/dev/random` in a *nix. To generate a base64-encoded 256 bit
+(32 byte) random sequence, try:
 
-    dd if=/dev/urandom bs=12 count=1 2>/dev/null | openssl base64
+    dd if=/dev/urandom bs=32 count=1 2>/dev/null | openssl base64
 
 ### Attribution
 
