@@ -2,6 +2,8 @@ require 'spec_helper'
 require 'fernet'
 
 describe Fernet do
+  after { Fernet::Configuration.run }
+
   let(:token_data) do
     { :email => 'harold@heroku.com', :id => '123', :arbitrary => 'data' }
   end
@@ -116,6 +118,20 @@ describe Fernet do
     payload.should match /password1/
 
     Fernet.verify(secret, token, false) do |verifier|
+      verifier.data['password'].should == 'password1'
+    end
+  end
+
+  it 'can disable encryption via global configuration' do
+    Fernet::Configuration.run { |c| c.encrypt = false }
+    token = Fernet.generate(secret) do |generator|
+      generator.data['password'] = 'password1'
+    end
+
+    payload = Base64.decode64(token)
+    payload.should match /password1/
+
+    Fernet.verify(secret, token) do |verifier|
       verifier.data['password'].should == 'password1'
     end
   end

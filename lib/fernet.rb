@@ -11,11 +11,11 @@ end
 Fernet::Configuration.run
 
 module Fernet
-  def self.generate(secret, encrypt = true, &block)
+  def self.generate(secret, encrypt = Configuration.encrypt, &block)
     Generator.new(secret, encrypt).generate(&block)
   end
 
-  def self.verify(secret, token, decrypt = true, &block)
-    Verifier.new(secret, decrypt).verify_token(token, &block)
+  def self.verify(secret, token, encrypt = Configuration.encrypt, &block)
+    Verifier.new(secret, encrypt).verify_token(token, &block)
   end
 end
