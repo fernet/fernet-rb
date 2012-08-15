@@ -1,5 +1,5 @@
 require 'base64'
-require 'json'
+require 'yajl'
 require 'openssl'
 require 'date'
 
@@ -22,7 +22,7 @@ module Fernet
         iv = encrypt_data!
         @payload = "#{base64(data)}|#{base64(iv)}"
       else
-        @payload = base64(JSON.dump(data))
+        @payload = base64(Yajl::Encoder.encode(data))
       end
 
       mac = OpenSSL::HMAC.hexdigest('sha256', payload, signing_key)
@@ -47,7 +47,7 @@ module Fernet
       iv         = cipher.random_iv
       cipher.iv  = iv
       cipher.key = encryption_key
-      @data = cipher.update(JSON.dump(data)) + cipher.final
+      @data = cipher.update(Yajl::Encoder.encode(data)) + cipher.final
       iv
     end
 
