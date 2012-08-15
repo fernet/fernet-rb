@@ -3,11 +3,11 @@ require 'fernet'
 
 describe Fernet do
   let(:token_data) do
-    { email: 'harold@heroku.com', id: '123', arbitrary: 'data' }
+    { :email => 'harold@heroku.com', :id => '123', :arbitrary => 'data' }
   end
 
-  let(:secret) { 'JrdICDH6x3M7duQeM8dJEMK4Y5TkBIsYDw1lPy35RiY=' }
-  let(:bad_secret) { 'jrdICDH6x3M7duQeM8dJEMK4Y5TkBIsYDw1lPy35RiY=' }
+  let(:secret)     { 'JrdICDH6x3M7duQeM8dJEMK4Y5TkBIsYDw1lPy35RiY=' }
+  let(:bad_secret) { 'badICDH6x3M7duQeM8dJEMK4Y5TkBIsYDw1lPy35RiY=' }
 
   it 'can verify tokens it generates' do
     token = Fernet.generate(secret) do |generator|

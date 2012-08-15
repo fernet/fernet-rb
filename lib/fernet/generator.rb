@@ -16,7 +16,7 @@ module Fernet
 
     def generate
       yield self if block_given?
-      data.merge!(issued_at: DateTime.now)
+      data.merge!(:issued_at => DateTime.now)
 
       if encrypt?
         iv = encrypt_data!
