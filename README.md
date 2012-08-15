@@ -58,6 +58,18 @@ The specs
 ([spec/fernet_spec.rb](https://github.com/hgmnz/fernet/blob/master/spec/fernet_spec.rb))
 have more usage examples.
 
+### Global configuration
+
+It's possible to configure fernet via the `Configuration` class. Put this in an initializer:
+
+```ruby
+# default values shown here
+Fernet::Configuration.run do |config|
+  config.enforce_ttl = true
+  config.ttl         = 60
+end
+```
+
 ### Generating a secret
 
 Generating appropriate secrets is beyond the scope of `Fernet`, but you should
