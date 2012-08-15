@@ -135,4 +135,14 @@ describe Fernet do
       verifier.data['password'].should == 'password1'
     end
   end
+
+  it 'returns the unencrypted message upon verify' do
+    token = Fernet.generate(secret) do |generator|
+      generator.data['password'] = 'password1'
+    end
+
+    verifier = Fernet.verifier(secret, token)
+    verifier.should be_valid
+    verifier.data['password'].should == 'password1'
+  end
 end

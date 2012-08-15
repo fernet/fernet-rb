@@ -18,4 +18,10 @@ module Fernet
   def self.verify(secret, token, encrypt = Configuration.encrypt, &block)
     Verifier.new(secret, encrypt).verify_token(token, &block)
   end
+
+  def self.verifier(secret, token, encrypt = Configuration.encrypt)
+    Verifier.new(secret, encrypt).tap do |v|
+      v.verify_token(token)
+    end
+  end
 end

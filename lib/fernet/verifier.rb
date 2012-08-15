@@ -25,7 +25,11 @@ module Fernet
         custom_verification = true
       end
 
-      signatures_match? && token_recent_enough? && custom_verification
+      @valid = signatures_match? && token_recent_enough? && custom_verification
+    end
+
+    def valid?
+      @valid
     end
 
     def inspect

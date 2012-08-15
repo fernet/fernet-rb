@@ -54,6 +54,17 @@ The `verified` variable will be true if:
 Otherwise, `verified` will be false, and you should deny the request with an
 HTTP 401, for example.
 
+The `Fernet.verify` method can be awkward if extracting the plain text data is
+required. For this case, a `verifier` can be requested that makes more
+pleasent:
+
+```ruby
+verifier = Fernet.verifier(secret, token)
+if verifier.valid? # signature valid, TTL verified
+  operate_on(verifier.data) # the original, decrypted data
+end
+```
+
 The specs
 ([spec/fernet_spec.rb](https://github.com/hgmnz/fernet/blob/master/spec/fernet_spec.rb))
 have more usage examples.
