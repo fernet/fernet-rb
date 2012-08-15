@@ -6,11 +6,13 @@ require 'date'
 module Fernet
   class Verifier
     attr_reader :token, :data
-    attr_writer :seconds_valid
+    attr_accessor :ttl, :enforce_ttl
 
     def initialize(secret, decrypt)
-      @secret  = Secret.new(secret, decrypt)
-      @decrypt = decrypt
+      @secret      = Secret.new(secret, decrypt)
+      @decrypt     = decrypt
+      @ttl         = 60
+      @enforce_ttl = true
     end
 
     def verify_token(token)
@@ -27,7 +29,7 @@ module Fernet
     end
 
     def inspect
-      "#<Fernet::Verifier @secret=[masked] @token=#{@token} @data=#{@data.inspect} @seconds_valid=#{@seconds_valid}>"
+      "#<Fernet::Verifier @secret=[masked] @token=#{@token} @data=#{@data.inspect} @ttl=#{@ttl}>"
     end
     alias to_s inspect
 
@@ -49,7 +51,11 @@ module Fernet
     end
 
     def token_recent_enough?
-      DateTime.parse(data['issued_at']) > (DateTime.now - 60)
+      if enforce_ttl?
+        DateTime.parse(data['issued_at']) > (now - ttl)
+      else
+        true
+      end
     end
 
     def signatures_match?
@@ -80,5 +86,12 @@ module Fernet
       @decrypt
     end
 
+    def enforce_ttl?
+      @enforce_ttl
+    end
+
+    def now
+      DateTime.now
+    end
   end
 end

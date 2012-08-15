@@ -45,7 +45,7 @@ describe Fernet do
     end
 
     Fernet.verify(bad_secret, token) do |verifier|
-      verifier.seconds_valid = 0
+      verifier.ttl = 0
     end.should be_false
   end
 
@@ -55,6 +55,20 @@ describe Fernet do
     end
 
     Fernet.verify(secret, token).should be_true
+  end
+
+  it 'can TTL enforcement' do
+    token = Fernet.generate(secret) do |generator|
+      generator.data = token_data
+    end
+
+    Fernet.verify(secret, token) do |verifier|
+      def verifier.now
+        Time.now + 99999999999
+      end
+      verifier.enforce_ttl = false
+      true
+    end.should be_true
   end
 
   it 'generates without custom data' do
@@ -88,5 +102,4 @@ describe Fernet do
       verifier.data['password'].should == 'password1'
     end
   end
-
 end
