@@ -55,8 +55,8 @@ Otherwise, `verified` will be false, and you should deny the request with an
 HTTP 401, for example.
 
 The `Fernet.verify` method can be awkward if extracting the plain text data is
-required. For this case, a `verifier` can be requested that makes more
-pleasent:
+required. For this case, a `verifier` can be requested that makes that
+use case more pleasent:
 
 ```ruby
 verifier = Fernet.verifier(secret, token)
