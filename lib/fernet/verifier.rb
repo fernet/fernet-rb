@@ -11,8 +11,8 @@ module Fernet
     def initialize(secret, decrypt)
       @secret      = Secret.new(secret, decrypt)
       @decrypt     = decrypt
-      @ttl         = 60
-      @enforce_ttl = true
+      @ttl         = Configuration.ttl
+      @enforce_ttl = Configuration.enforce_ttl
     end
 
     def verify_token(token)
