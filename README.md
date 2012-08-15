@@ -67,6 +67,7 @@ It's possible to configure fernet via the `Configuration` class. Put this in an 
 Fernet::Configuration.run do |config|
   config.enforce_ttl = true
   config.ttl         = 60
+  config.encrypt     = true
 end
 ```
 
