@@ -4,8 +4,8 @@ require File.expand_path('../lib/fernet/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Harold Giménez"]
   gem.email         = ["harold.gimenez@gmail.com"]
-  gem.description   = %q{Delicious HMAC Digest(if) authentication}
-  gem.summary       = %q{Easily generate and verify HMAC based authentication tokens}
+  gem.description   = %q{Delicious HMAC Digest(if) authentication and encryption}
+  gem.summary       = %q{Easily generate and verify AES encrypted HMAC based authentication tokens}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
