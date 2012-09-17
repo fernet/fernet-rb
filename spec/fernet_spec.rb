@@ -46,7 +46,7 @@ describe Fernet do
       generator.data = token_data
     end
 
-    Fernet.verify(bad_secret, token) do |verifier|
+    Fernet.verify(secret, token) do |verifier|
       verifier.ttl = 0
     end.should be_false
   end
