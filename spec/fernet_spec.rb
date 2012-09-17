@@ -33,11 +33,11 @@ describe Fernet do
 
   it 'fails with a bad custom verification' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = token_data
+      generator.data = { email: 'harold@heroku.com' }
     end
 
-    Fernet.verify(bad_secret, token) do |verifier|
-      verifier.data['email'] == 'harold@gmail.com'
+    Fernet.verify(secret, token) do |verifier|
+      verifier.data['email'] == 'lol@heroku.com'
     end.should be_false
   end
 
