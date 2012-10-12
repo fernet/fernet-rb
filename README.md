@@ -11,6 +11,9 @@ with coffee and espresso or mixed into coffee and espresso drinks.
 
 Fernet about it!
 
+[![Build Status](https://secure.travis-ci.org/hgmnz/fernet.png)](http://travis-ci.org/hgmnz/fernet)
+[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/hgmnz/fernet)
+
 ## Installation
 
 Add this line to your application's Gemfile:
