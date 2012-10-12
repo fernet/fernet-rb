@@ -1,5 +1,8 @@
 # Fernet
 
+[![Build Status](https://secure.travis-ci.org/hgmnz/fernet.png)](http://travis-ci.org/hgmnz/fernet)
+[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/hgmnz/fernet)
+
 Fernet allows you to easily generate and verify **HMAC based authentication
 tokens** for issuing API requests between remote servers. It also **encrypts**
 data by default, so it can be used to transmit secure messages over the wire.
@@ -10,9 +13,6 @@ Fernet is usually served as a *digestif* after a meal but may also be served
 with coffee and espresso or mixed into coffee and espresso drinks.
 
 Fernet about it!
-
-[![Build Status](https://secure.travis-ci.org/hgmnz/fernet.png)](http://travis-ci.org/hgmnz/fernet)
-[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/hgmnz/fernet)
 
 ## Installation
 
