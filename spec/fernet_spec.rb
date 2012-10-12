@@ -37,7 +37,7 @@ describe Fernet do
 
   it 'fails with a bad custom verification' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = { email: 'harold@heroku.com' }
+      generator.data = { :email => 'harold@heroku.com' }
     end
 
     expect(
