@@ -16,9 +16,11 @@ describe Fernet do
       generator.data = token_data
     end
 
-    Fernet.verify(secret, token) do |verifier|
-      verifier.data['email'] == 'harold@heroku.com'
-    end.should be_true
+    expect(
+      Fernet.verify(secret, token) do |verifier|
+        verifier.data['email'] == 'harold@heroku.com'
+      end
+    ).to be_true
   end
 
   it 'fails with a bad secret' do
@@ -26,9 +28,11 @@ describe Fernet do
       generator.data = token_data
     end
 
-    Fernet.verify(bad_secret, token) do |verifier|
-      verifier.data['email'] == 'harold@heroku.com'
-    end.should be_false
+    expect(
+      Fernet.verify(bad_secret, token) do |verifier|
+        verifier.data['email'] == 'harold@heroku.com'
+      end
+    ).to be_false
   end
 
   it 'fails with a bad custom verification' do
@@ -36,9 +40,11 @@ describe Fernet do
       generator.data = { email: 'harold@heroku.com' }
     end
 
-    Fernet.verify(secret, token) do |verifier|
-      verifier.data['email'] == 'lol@heroku.com'
-    end.should be_false
+    expect(
+      Fernet.verify(secret, token) do |verifier|
+        verifier.data['email'] == 'lol@heroku.com'
+      end
+    ).to be_false
   end
 
   it 'fails if the token is too old' do
@@ -46,9 +52,11 @@ describe Fernet do
       generator.data = token_data
     end
 
-    Fernet.verify(secret, token) do |verifier|
-      verifier.ttl = 0
-    end.should be_false
+    expect(
+      Fernet.verify(secret, token) do |verifier|
+        verifier.ttl = 0
+      end
+    ).to be_false
   end
 
   it 'verifies without a custom verification' do
@@ -56,7 +64,7 @@ describe Fernet do
       generator.data = token_data
     end
 
-    Fernet.verify(secret, token).should be_true
+    expect(Fernet.verify(secret, token)).to be_true
   end
 
   it 'can ignore TTL enforcement' do
@@ -64,13 +72,15 @@ describe Fernet do
       generator.data = token_data
     end
 
-    Fernet.verify(secret, token) do |verifier|
-      def verifier.now
-        Time.now + 99999999999
+    expect(
+      Fernet.verify(secret, token) do |verifier|
+        def verifier.now
+          Time.now + 99999999999
+        end
+        verifier.enforce_ttl = false
+        true
       end
-      verifier.enforce_ttl = false
-      true
-    end.should be_true
+    ).to be_true
   end
 
   it 'can ignore TTL enforcement via global config' do
@@ -82,18 +92,20 @@ describe Fernet do
       generator.data = token_data
     end
 
-    Fernet.verify(secret, token) do |verifier|
-      def verifier.now
-        Time.now + 99999999999
+    expect(
+      Fernet.verify(secret, token) do |verifier|
+        def verifier.now
+          Time.now + 99999999999
+        end
+        true
       end
-      true
-    end.should be_true
+    ).to be_true
   end
 
   it 'generates without custom data' do
     token = Fernet.generate(secret)
 
-    Fernet.verify(secret, token).should be_true
+    expect(Fernet.verify(secret, token)).to be_true
   end
 
   it 'can encrypt the payload' do
@@ -101,11 +113,10 @@ describe Fernet do
       generator.data['password'] = 'password1'
     end
 
-    payload = Base64.decode64(token)
-    payload.should_not match /password1/
+    expect(Base64.decode64(token)).not_to match /password1/
 
     Fernet.verify(secret, token) do |verifier|
-      verifier.data['password'].should == 'password1'
+      expect(verifier.data['password']).to eq('password1')
     end
   end
 
@@ -114,11 +125,10 @@ describe Fernet do
       generator.data['password'] = 'password1'
     end
 
-    payload = Base64.decode64(token)
-    payload.should match /password1/
+    expect(Base64.decode64(token)).to match /password1/
 
     Fernet.verify(secret, token, false) do |verifier|
-      verifier.data['password'].should == 'password1'
+      expect(verifier.data['password']).to eq('password1')
     end
   end
 
@@ -128,11 +138,10 @@ describe Fernet do
       generator.data['password'] = 'password1'
     end
 
-    payload = Base64.decode64(token)
-    payload.should match /password1/
+    expect(Base64.decode64(token)).to match /password1/
 
     Fernet.verify(secret, token) do |verifier|
-      verifier.data['password'].should == 'password1'
+      expect(verifier.data['password']).to eq('password1')
     end
   end
 
@@ -142,7 +151,7 @@ describe Fernet do
     end
 
     verifier = Fernet.verifier(secret, token)
-    verifier.should be_valid
-    verifier.data['password'].should == 'password1'
+    expect(verifier.valid?).to be_true
+    expect(verifier.data['password']).to eq('password1')
   end
 end
