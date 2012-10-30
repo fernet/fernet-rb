@@ -54,7 +54,14 @@ describe Fernet do
 
     expect(
       Fernet.verify(secret, token) do |verifier|
-        verifier.ttl = 0
+        verifier.ttl = 1
+
+        def verifier.now
+          now = DateTime.now
+          DateTime.new(now.year, now.month, now.day, now.hour,
+                       now.minute, now.second + 2, now.offset)
+        end
+        true
       end
     ).to be_false
   end
