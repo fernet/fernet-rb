@@ -56,7 +56,8 @@ module Fernet
 
     def token_recent_enough?
       if enforce_ttl?
-        DateTime.parse(data['issued_at']) > (now - ttl)
+        good_till = DateTime.parse(data['issued_at']) + (ttl.to_f / 24 / 60 / 60)
+        good_till > now
       else
         true
       end
