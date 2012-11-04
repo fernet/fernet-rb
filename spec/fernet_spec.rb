@@ -59,7 +59,7 @@ describe Fernet do
         def verifier.now
           now = DateTime.now
           DateTime.new(now.year, now.month, now.day, now.hour,
-                       now.minute, now.second + 2, now.offset)
+                       now.min, now.sec + 2, now.offset)
         end
         true
       end
