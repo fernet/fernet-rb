@@ -15,7 +15,5 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Fernet::VERSION
 
-  gem.add_dependency "yajl-ruby"
-
   gem.add_development_dependency "rspec"
 end
