@@ -1,4 +1,5 @@
 require 'base64'
+require 'yajl'
 require 'openssl'
 require 'date'
 
@@ -15,13 +16,13 @@ module Fernet
 
     def generate
       yield self if block_given?
-      data.merge!(:issued_at => DateTime.now.to_s)
+      data.merge!(:issued_at => DateTime.now)
 
       if encrypt?
         iv = encrypt_data!
         @payload = "#{base64(data)}|#{base64(iv)}"
       else
-        @payload = base64(Fernet::OkJson.encode(stringify_hash_keys(data)))
+        @payload = base64(Yajl::Encoder.encode(data))
       end
 
       mac = OpenSSL::HMAC.hexdigest('sha256', payload, signing_key)
@@ -46,7 +47,7 @@ module Fernet
       iv         = cipher.random_iv
       cipher.iv  = iv
       cipher.key = encryption_key
-      @data = cipher.update(Fernet::OkJson.encode(stringify_hash_keys(data))) + cipher.final
+      @data = cipher.update(Yajl::Encoder.encode(data)) + cipher.final
       iv
     end
 
@@ -66,11 +67,5 @@ module Fernet
       @encrypt
     end
 
-    def stringify_hash_keys(hash)
-      hash.inject({}) do |result, (k, v)|
-        result[k.to_s] = v
-      result
-      end
-    end
   end
 end
