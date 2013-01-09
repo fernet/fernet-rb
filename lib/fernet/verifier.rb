@@ -51,7 +51,7 @@ module Fernet
         signing_blob = encoded_data
         @data = Yajl::Parser.parse(Base64.urlsafe_decode64(encoded_data))
       end
-      @regenerated_mac = OpenSSL::HMAC.hexdigest('sha256', signing_blob, signing_key)
+      @regenerated_mac = OpenSSL::HMAC.hexdigest('sha256', signing_key, signing_blob)
     end
 
     def token_recent_enough?

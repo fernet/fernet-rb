@@ -25,7 +25,7 @@ module Fernet
         @payload = base64(Yajl::Encoder.encode(data))
       end
 
-      mac = OpenSSL::HMAC.hexdigest('sha256', payload, signing_key)
+      mac = OpenSSL::HMAC.hexdigest('sha256', signing_key, payload)
       "#{payload}|#{mac}"
     end
 
