@@ -90,6 +90,20 @@ describe Fernet do
     ).to be_true
   end
 
+  it 'forbids changes to validation parameters post validation' do
+    token = Fernet.generate(secret) do |generator|
+      generator.data = token_data
+    end
+
+    verifier = Fernet.verifier(secret, token) do |verifier|
+      def verifier.now
+        Time.now + 99999999999
+      end
+    end
+    expect { verifier.enforce_ttl = false }.to raise_error
+    expect { verifier.ttl = 999999999999 }.to raise_error
+  end
+
   it 'can ignore TTL enforcement via global config' do
     Fernet::Configuration.run do |config|
       config.enforce_ttl = false
