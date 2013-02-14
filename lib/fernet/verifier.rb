@@ -5,14 +5,29 @@ require 'date'
 
 module Fernet
   class Verifier
-    attr_reader :token, :data
-    attr_accessor :ttl, :enforce_ttl
+    attr_reader :token, :data, :ttl, :enforce_ttl
 
     def initialize(secret, decrypt)
       @secret      = Secret.new(secret, decrypt)
       @decrypt     = decrypt
       @ttl         = Configuration.ttl
       @enforce_ttl = Configuration.enforce_ttl
+    end
+
+    def ttl=(value)
+      if @valid.nil?
+        @ttl = value
+      else
+        raise ArgumentError, "Already verified"
+      end
+    end
+
+    def enforce_ttl=(value)
+      if @valid.nil?
+        @enforce_ttl = value
+      else
+        raise ArgumentError, "Already verified"
+      end
     end
 
     def verify_token(token)
