@@ -56,11 +56,11 @@ module Fernet
     end
 
     def encryption_key
-      @secret.encryption_key
+      secret.encryption_key
     end
 
     def signing_key
-      @secret.signing_key
+      secret.signing_key
     end
 
     def encrypt?
