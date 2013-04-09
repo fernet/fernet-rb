@@ -25,7 +25,7 @@ module Fernet
         @payload = base64(Yajl::Encoder.encode(data))
       end
 
-      mac = OpenSSL::HMAC.hexdigest('sha256', signing_key, payload)
+      mac = OpenSSL::HMAC.hexdigest('sha256', secret.signing_key, payload)
       "#{payload}|#{mac}"
     end
 
@@ -46,21 +46,13 @@ module Fernet
       cipher.encrypt
       iv         = cipher.random_iv
       cipher.iv  = iv
-      cipher.key = encryption_key
+      cipher.key = secret.encryption_key
       @data = cipher.update(Yajl::Encoder.encode(data)) + cipher.final
       iv
     end
 
     def base64(chars)
       Base64.urlsafe_encode64(chars)
-    end
-
-    def encryption_key
-      secret.encryption_key
-    end
-
-    def signing_key
-      secret.signing_key
     end
 
     def encrypt?
