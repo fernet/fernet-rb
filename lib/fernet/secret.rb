@@ -6,15 +6,20 @@ module Fernet
     end
 
     def encryption_key
-      @secret.slice(@secret.size/2, @secret.size)
+      decoded_secret.slice(decoded_secret.size/2, decoded_secret.size)
     end
 
     def signing_key
       if @encrypt
-        @secret.slice(0, @secret.size/2)
+        decoded_secret.slice(0, decoded_secret.size/2)
       else
-        @secret
+        decoded_secret
       end
+    end
+
+  private
+    def decoded_secret
+      @decoded_secret ||= Base64.decode64(@secret)
     end
   end
 end
