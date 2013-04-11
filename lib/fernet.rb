@@ -16,11 +16,11 @@ module Fernet
   end
 
   def self.verify(secret, token, &block)
-    Verifier.new(secret, token: token).verify(&block)
+    Verifier.new(secret, :token => token).verify(&block)
   end
 
   def self.verifier(secret, token, &block)
-    Verifier.new(secret, token: token).tap do |v|
+    Verifier.new(secret, :token => token).tap do |v|
       v.verify(&block)
     end
   end
