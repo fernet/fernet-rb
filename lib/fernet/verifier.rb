@@ -5,17 +5,17 @@ require 'date'
 
 module Fernet
   class Verifier
-    attr_reader :token, :data
+    attr_reader :token
     attr_accessor :ttl, :enforce_ttl
 
-    def initialize(secret)
+    def initialize(secret, opts = {})
       @secret      = Secret.new(secret)
       @ttl         = Configuration.ttl
       @enforce_ttl = Configuration.enforce_ttl
+      @token       = opts[:token]
     end
 
-    def verify_token(token)
-      @token = token
+    def verify
       deconstruct
 
       if block_given?
@@ -24,20 +24,42 @@ module Fernet
         custom_verification = true
       end
 
+      @must_verify = false
       @valid = signatures_match? && token_recent_enough? && custom_verification
     end
 
     def valid?
+      verify if must_verify?
       @valid
     end
 
     def inspect
-      "#<Fernet::Verifier @secret=[masked] @token=#{@token} @data=#{@data.inspect} @ttl=#{@ttl}>"
+      "#<Fernet::Verifier @secret=[masked] @token=#{@token} @data=#{@data.inspect} @ttl=#{@ttl} @enforce_ttl=#{@enforce_ttl}>"
     end
     alias to_s inspect
 
+    def ttl=(new_ttl)
+      @ttl = new_ttl
+      @must_verify = true
+    end
+
+    def enforce_ttl=(new_enforce_ttl)
+      @enforce_ttl = new_enforce_ttl
+      @must_verify = true
+    end
+
+    def data
+      verify if must_verify?
+      @data
+    end
+
   private
     attr_reader :secret
+
+    def must_verify?
+      @must_verify || @valid.nil?
+    end
+
     def deconstruct
       decoded_token       = Base64.urlsafe_decode64(@token)
       @received_signature = decoded_token[0,64]

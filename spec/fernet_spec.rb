@@ -121,4 +121,18 @@ describe Fernet do
       expect(verifier.data).to eq('password1')
     end
   end
+
+  it 'allows overriding enforce_ttl on a verifier' do
+    Fernet::Configuration.run do |config|
+      config.enforce_ttl = true
+      config.ttl = 0
+    end
+    token = Fernet.generate(secret) do |generator|
+      generator.data = 'password1'
+    end
+    verifier = Fernet.verifier(secret, token)
+    verifier.enforce_ttl = false
+    expect(verifier.valid?).to be_true
+    expect(verifier.data).to eq('password1')
+  end
 end
