@@ -124,29 +124,4 @@ describe Fernet do
       expect(verifier.data).to eq('password1')
     end
   end
-
-  xit 'does not encrypt when asked nicely' do
-    token = Fernet.generate(secret, false) do |generator|
-      generator.data['password'] = 'password1'
-    end
-
-    expect(Base64.decode64(token)).to match /password1/
-
-    Fernet.verify(secret, token, false) do |verifier|
-      expect(verifier.data['password']).to eq('password1')
-    end
-  end
-
-  xit 'can disable encryption via global configuration' do
-    Fernet::Configuration.run { |c| c.encrypt = false }
-    token = Fernet.generate(secret) do |generator|
-      generator.data['password'] = 'password1'
-    end
-
-    expect(Base64.decode64(token)).to match /password1/
-
-    Fernet.verify(secret, token) do |verifier|
-      expect(verifier.data['password']).to eq('password1')
-    end
-  end
 end
