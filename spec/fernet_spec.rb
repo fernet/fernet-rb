@@ -4,56 +4,48 @@ require 'fernet'
 describe Fernet do
   after { Fernet::Configuration.run }
 
-  let(:token_data) do
-    Yajl::Encoder.encode({
-      :email     => 'harold@heroku.com',
-      :id        => '123',
-      :arbitrary => 'data'
-    })
-  end
-
   let(:secret)     { 'JrdICDH6x3M7duQeM8dJEMK4Y5TkBIsYDw1lPy35RiY=' }
   let(:bad_secret) { 'badICDH6x3M7duQeM8dJEMK4Y5TkBIsYDw1lPy35RiY=' }
 
   it 'can verify tokens it generates' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = token_data
+      generator.data = 'harold@heroku.com'
     end
 
     expect(
       Fernet.verify(secret, token) do |verifier|
-        Yajl::Parser.parse(verifier.data)['email'] == 'harold@heroku.com'
+        verifier.data == 'harold@heroku.com'
       end
     ).to be_true
   end
 
   it 'fails with a bad secret' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = token_data
+      generator.data = 'harold@heroku.com'
     end
 
     expect(
       Fernet.verify(bad_secret, token) do |verifier|
-        verifier.data['email'] == 'harold@heroku.com'
+        verifier.data == 'harold@heroku.com'
       end
     ).to be_false
   end
 
   it 'fails with a bad custom verification' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = Yajl::Encoder.encode({ :email => 'harold@heroku.com' })
+      generator.data = 'harold@heroku.com'
     end
 
     expect(
       Fernet.verify(secret, token) do |verifier|
-        Yajl::Parser.parse(verifier.data)['email'] == 'lol@heroku.com'
+        verifier.data == 'lol@heroku.com'
       end
     ).to be_false
   end
 
   it 'fails if the token is too old' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = token_data
+      generator.data = 'harold@heroku.com'
     end
 
     expect(
@@ -72,7 +64,7 @@ describe Fernet do
 
   it 'verifies without a custom verification' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = token_data
+      generator.data = 'harold@heroku.com'
     end
 
     expect(Fernet.verify(secret, token)).to be_true
@@ -80,7 +72,7 @@ describe Fernet do
 
   it 'can ignore TTL enforcement' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = token_data
+      generator.data = 'harold@heroku.com'
     end
 
     expect(
@@ -100,7 +92,7 @@ describe Fernet do
     end
 
     token = Fernet.generate(secret) do |generator|
-      generator.data = token_data
+      generator.data = 'harold@heroku.com'
     end
 
     expect(

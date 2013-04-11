@@ -1,6 +1,5 @@
 #encoding UTF-8
 require 'base64'
-require 'yajl'
 require 'openssl'
 require 'date'
 
