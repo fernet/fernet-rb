@@ -1,3 +1,4 @@
+#encoding UTF-8
 require 'base64'
 require 'yajl'
 require 'openssl'
@@ -5,28 +6,20 @@ require 'date'
 
 module Fernet
   class Generator
-    attr_accessor :data, :payload
+    attr_accessor :data
 
-    def initialize(secret, encrypt)
-      @secret  = Secret.new(secret, encrypt)
-      @encrypt = encrypt
-      @payload = ''
-      @data    = {}
+    def initialize(secret)
+      @secret  = Secret.new(secret)
+      @data    = ''
     end
 
     def generate
       yield self if block_given?
-      data.merge!(:issued_at => Time.now.to_i)
-
-      if encrypt?
-        iv = encrypt_data!
-        @payload = "#{base64(data)}|#{base64(iv)}"
-      else
-        @payload = base64(Yajl::Encoder.encode(data))
-      end
-
+      iv, encrypted_data = encrypt(data)
+      issued_timestamp = Time.now.to_i
+      payload = [issued_timestamp].pack("Q") + iv + encrypted_data
       mac = OpenSSL::HMAC.hexdigest('sha256', secret.signing_key, payload)
-      "#{payload}|#{mac}"
+      Base64.urlsafe_encode64(mac + payload)
     end
 
     def inspect
@@ -34,30 +27,16 @@ module Fernet
     end
     alias to_s inspect
 
-    def data
-      @data ||= {}
-    end
-
   private
     attr_reader :secret
 
-    def encrypt_data!
+    def encrypt(data)
       cipher = OpenSSL::Cipher.new('AES-128-CBC')
       cipher.encrypt
       iv         = cipher.random_iv
       cipher.iv  = iv
       cipher.key = secret.encryption_key
-      @data = cipher.update(Yajl::Encoder.encode(data)) + cipher.final
-      iv
+      [iv, cipher.update(data) + cipher.final]
     end
-
-    def base64(chars)
-      Base64.urlsafe_encode64(chars)
-    end
-
-    def encrypt?
-      @encrypt
-    end
-
   end
 end

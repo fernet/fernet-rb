@@ -1,8 +1,7 @@
 module Fernet
   class Secret
-    def initialize(secret, encrypt)
+    def initialize(secret)
       @secret  = secret
-      @encrypt = encrypt
     end
 
     def encryption_key
@@ -10,11 +9,7 @@ module Fernet
     end
 
     def signing_key
-      if @encrypt
-        decoded_secret.slice(0, decoded_secret.size/2)
-      else
-        decoded_secret
-      end
+      decoded_secret.slice(0, decoded_secret.size/2)
     end
 
   private

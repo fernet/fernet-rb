@@ -1,3 +1,4 @@
+#encoding UTF-8
 require 'base64'
 require 'yajl'
 require 'openssl'
@@ -8,9 +9,8 @@ module Fernet
     attr_reader :token, :data
     attr_accessor :ttl, :enforce_ttl
 
-    def initialize(secret, decrypt)
-      @secret      = Secret.new(secret, decrypt)
-      @decrypt     = decrypt
+    def initialize(secret)
+      @secret      = Secret.new(secret)
       @ttl         = Configuration.ttl
       @enforce_ttl = Configuration.enforce_ttl
     end
@@ -39,24 +39,21 @@ module Fernet
 
   private
     attr_reader :secret
-
     def deconstruct
-      parts = @token.split('|')
-      if decrypt?
-        encrypted_data, iv, @received_signature = *parts
-        @data = Yajl::Parser.parse(decrypt!(encrypted_data, Base64.urlsafe_decode64(iv)))
-        signing_blob = "#{encrypted_data}|#{iv}"
-      else
-        encoded_data, @received_signature = *parts
-        signing_blob = encoded_data
-        @data = Yajl::Parser.parse(Base64.urlsafe_decode64(encoded_data))
-      end
-      @regenerated_mac = OpenSSL::HMAC.hexdigest('sha256', signing_key, signing_blob)
+      decoded_token       = Base64.urlsafe_decode64(@token)
+      @received_signature = decoded_token[0,64]
+      issued_timestamp    = decoded_token[64,8].unpack("Q*").first
+      @issued_at          = DateTime.strptime(issued_timestamp.to_s, '%s')
+      iv                  = decoded_token[72,16]
+      encrypted_data      = decoded_token[88..-1]
+      @data = decrypt!(encrypted_data, iv)
+      signing_blob = [issued_timestamp].pack("Q") + iv + encrypted_data
+      @regenerated_mac = OpenSSL::HMAC.hexdigest('sha256', secret.signing_key, signing_blob)
     end
 
     def token_recent_enough?
       if enforce_ttl?
-        good_till = Time.at(data['issued_at']).to_datetime + (ttl.to_f / 24 / 60 / 60)
+        good_till = @issued_at + (ttl.to_f / 24 / 60 / 60)
         good_till > now
       else
         true
@@ -75,20 +72,8 @@ module Fernet
       decipher = OpenSSL::Cipher.new('AES-128-CBC')
       decipher.decrypt
       decipher.iv  = iv
-      decipher.key = encryption_key
-      decipher.update(Base64.urlsafe_decode64(encrypted_data)) + decipher.final
-    end
-
-    def encryption_key
-      @secret.encryption_key
-    end
-
-    def signing_key
-      @secret.signing_key
-    end
-
-    def decrypt?
-      @decrypt
+      decipher.key = secret.encryption_key
+      decipher.update(encrypted_data) + decipher.final
     end
 
     def enforce_ttl?

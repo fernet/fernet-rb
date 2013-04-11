@@ -11,16 +11,16 @@ end
 Fernet::Configuration.run
 
 module Fernet
-  def self.generate(secret, encrypt = Configuration.encrypt, &block)
-    Generator.new(secret, encrypt).generate(&block)
+  def self.generate(secret, &block)
+    Generator.new(secret).generate(&block)
   end
 
-  def self.verify(secret, token, encrypt = Configuration.encrypt, &block)
-    Verifier.new(secret, encrypt).verify_token(token, &block)
+  def self.verify(secret, token, &block)
+    Verifier.new(secret).verify_token(token, &block)
   end
 
-  def self.verifier(secret, token, encrypt = Configuration.encrypt)
-    Verifier.new(secret, encrypt).tap do |v|
+  def self.verifier(secret, token)
+    Verifier.new(secret).tap do |v|
       v.verify_token(token)
     end
   end
