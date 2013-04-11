@@ -5,7 +5,11 @@ describe Fernet do
   after { Fernet::Configuration.run }
 
   let(:token_data) do
-    { :email => 'harold@heroku.com', :id => '123', :arbitrary => 'data' }
+    Yajl::Encoder.encode({
+      :email     => 'harold@heroku.com',
+      :id        => '123',
+      :arbitrary => 'data'
+    })
   end
 
   let(:secret)     { 'JrdICDH6x3M7duQeM8dJEMK4Y5TkBIsYDw1lPy35RiY=' }
@@ -18,7 +22,7 @@ describe Fernet do
 
     expect(
       Fernet.verify(secret, token) do |verifier|
-        verifier.data['email'] == 'harold@heroku.com'
+        Yajl::Parser.parse(verifier.data)['email'] == 'harold@heroku.com'
       end
     ).to be_true
   end
@@ -37,12 +41,12 @@ describe Fernet do
 
   it 'fails with a bad custom verification' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = { :email => 'harold@heroku.com' }
+      generator.data = Yajl::Encoder.encode({ :email => 'harold@heroku.com' })
     end
 
     expect(
       Fernet.verify(secret, token) do |verifier|
-        verifier.data['email'] == 'lol@heroku.com'
+        Yajl::Parser.parse(verifier.data)['email'] == 'lol@heroku.com'
       end
     ).to be_false
   end
@@ -109,25 +113,19 @@ describe Fernet do
     ).to be_true
   end
 
-  it 'generates without custom data' do
-    token = Fernet.generate(secret)
-
-    expect(Fernet.verify(secret, token)).to be_true
-  end
-
-  it 'can encrypt the payload' do
-    token = Fernet.generate(secret, true) do |generator|
-      generator.data['password'] = 'password1'
+  it 'encrypts the payload' do
+    token = Fernet.generate(secret) do |generator|
+      generator.data = 'password1'
     end
 
     expect(Base64.decode64(token)).not_to match /password1/
 
     Fernet.verify(secret, token) do |verifier|
-      expect(verifier.data['password']).to eq('password1')
+      expect(verifier.data).to eq('password1')
     end
   end
 
-  it 'does not encrypt when asked nicely' do
+  xit 'does not encrypt when asked nicely' do
     token = Fernet.generate(secret, false) do |generator|
       generator.data['password'] = 'password1'
     end
@@ -139,7 +137,7 @@ describe Fernet do
     end
   end
 
-  it 'can disable encryption via global configuration' do
+  xit 'can disable encryption via global configuration' do
     Fernet::Configuration.run { |c| c.encrypt = false }
     token = Fernet.generate(secret) do |generator|
       generator.data['password'] = 'password1'
@@ -150,15 +148,5 @@ describe Fernet do
     Fernet.verify(secret, token) do |verifier|
       expect(verifier.data['password']).to eq('password1')
     end
-  end
-
-  it 'returns the unencrypted message upon verify' do
-    token = Fernet.generate(secret) do |generator|
-      generator.data['password'] = 'password1'
-    end
-
-    verifier = Fernet.verifier(secret, token)
-    expect(verifier.valid?).to be_true
-    expect(verifier.data['password']).to eq('password1')
   end
 end
