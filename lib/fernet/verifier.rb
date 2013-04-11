@@ -16,12 +16,12 @@ module Fernet
     end
 
     def verify
-      custom_verification = block_given? ? yield(self) : true
+      yield self if block_given?
 
       deconstruct
 
       @must_verify = false
-      @valid = signatures_match? && token_recent_enough? && custom_verification
+      @valid = signatures_match? && token_recent_enough?
     end
 
     def valid?

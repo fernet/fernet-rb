@@ -31,18 +31,6 @@ describe Fernet do
     ).to be_false
   end
 
-  it 'fails with a bad custom verification' do
-    token = Fernet.generate(secret) do |generator|
-      generator.data = 'harold@heroku.com'
-    end
-
-    expect(
-      Fernet.verify(secret, token) do |verifier|
-        verifier.data == 'lol@heroku.com'
-      end
-    ).to be_false
-  end
-
   it 'fails if the token is too old' do
     token = Fernet.generate(secret) do |generator|
       generator.data = 'harold@heroku.com'
@@ -57,17 +45,8 @@ describe Fernet do
           DateTime.new(now.year, now.month, now.day, now.hour,
                        now.min, now.sec + 2, now.offset)
         end
-        true
       end
     ).to be_false
-  end
-
-  it 'verifies without a custom verification' do
-    token = Fernet.generate(secret) do |generator|
-      generator.data = 'harold@heroku.com'
-    end
-
-    expect(Fernet.verify(secret, token)).to be_true
   end
 
   it 'can ignore TTL enforcement' do
@@ -86,7 +65,6 @@ describe Fernet do
           DateTime.now + 99999999999
         end
         verifier.enforce_ttl = false
-        true
       end
     ).to be_true
   end
@@ -105,7 +83,6 @@ describe Fernet do
         def verifier.now
           Time.now + 99999999999
         end
-        true
       end
     ).to be_true
   end
@@ -146,7 +123,6 @@ describe Fernet do
     end
     verifier = Fernet.verifier(secret, token) do |v|
       v.enforce_ttl = false
-      true
     end
     expect(verifier.data).to eq('password1')
     expect(verifier.valid?).to be_true
