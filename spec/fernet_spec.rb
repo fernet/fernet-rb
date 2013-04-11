@@ -71,6 +71,11 @@ describe Fernet do
   end
 
   it 'can ignore TTL enforcement' do
+    # Make sure the global value is set to true
+    Fernet::Configuration.run do |config|
+      config.enforce_ttl = true
+    end
+
     token = Fernet.generate(secret) do |generator|
       generator.data = 'harold@heroku.com'
     end
@@ -78,7 +83,7 @@ describe Fernet do
     expect(
       Fernet.verify(secret, token) do |verifier|
         def verifier.now
-          Time.now + 99999999999
+          DateTime.now + 99999999999
         end
         verifier.enforce_ttl = false
         true
