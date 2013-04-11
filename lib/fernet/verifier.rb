@@ -16,13 +16,9 @@ module Fernet
     end
 
     def verify
-      deconstruct
+      custom_verification = block_given? ? yield(self) : true
 
-      if block_given?
-        custom_verification = yield self
-      else
-        custom_verification = true
-      end
+      deconstruct
 
       @must_verify = false
       @valid = signatures_match? && token_recent_enough? && custom_verification
@@ -33,25 +29,25 @@ module Fernet
       @valid
     end
 
-    def inspect
-      "#<Fernet::Verifier @secret=[masked] @token=#{@token} @data=#{@data.inspect} @ttl=#{@ttl} @enforce_ttl=#{@enforce_ttl}>"
-    end
-    alias to_s inspect
-
-    def ttl=(new_ttl)
-      @ttl = new_ttl
-      @must_verify = true
-    end
-
-    def enforce_ttl=(new_enforce_ttl)
-      @enforce_ttl = new_enforce_ttl
-      @must_verify = true
-    end
-
     def data
       verify if must_verify?
       @data
     end
+
+    def ttl=(new_ttl)
+      @must_verify = true
+      @ttl = new_ttl
+    end
+
+    def enforce_ttl=(new_enforce_ttl)
+      @must_verify = true
+      @enforce_ttl = new_enforce_ttl
+    end
+
+    def inspect
+      "#<Fernet::Verifier @secret=[masked] @token=#{@token} @data=#{@data.inspect} @ttl=#{@ttl} @enforce_ttl=#{@enforce_ttl}>"
+    end
+    alias to_s inspect
 
   private
     attr_reader :secret
