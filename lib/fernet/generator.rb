@@ -14,7 +14,7 @@ module Fernet
 
     def generate
       yield self if block_given?
-      iv, encrypted_data = encrypt(data)
+      iv, encrypted_data = encrypt
       issued_timestamp = Time.now.to_i
       payload = [issued_timestamp].pack("Q") + iv + encrypted_data
       mac = OpenSSL::HMAC.hexdigest('sha256', secret.signing_key, payload)
@@ -29,13 +29,13 @@ module Fernet
   private
     attr_reader :secret
 
-    def encrypt(data)
+    def encrypt
       cipher = OpenSSL::Cipher.new('AES-128-CBC')
       cipher.encrypt
       iv         = cipher.random_iv
       cipher.iv  = iv
       cipher.key = secret.encryption_key
-      [iv, cipher.update(data) + cipher.final]
+      [iv, cipher.update(self.data) + cipher.final]
     end
   end
 end
