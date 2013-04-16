@@ -16,7 +16,7 @@ module Fernet
       yield self if block_given?
       iv, encrypted_data = encrypt(data)
       issued_timestamp = Time.now.to_i
-      payload = [issued_timestamp].pack("Q") + iv + encrypted_data
+      payload = [issued_timestamp].pack("Q>") + iv + encrypted_data
       mac = OpenSSL::HMAC.hexdigest('sha256', secret.signing_key, payload)
       Base64.urlsafe_encode64(mac + payload)
     end
