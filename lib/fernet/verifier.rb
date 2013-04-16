@@ -58,14 +58,14 @@ module Fernet
 
     def deconstruct
       decoded_token       = Base64.urlsafe_decode64(@token)
-      @received_signature = decoded_token[0,64]
-      issued_timestamp    = decoded_token[64,8].unpack("Q>*").first
+      @received_signature = decoded_token[0,32]
+      issued_timestamp    = decoded_token[32,8].unpack("Q>*").first
       @issued_at          = DateTime.strptime(issued_timestamp.to_s, '%s')
-      iv                  = decoded_token[72,16]
-      encrypted_data      = decoded_token[88..-1]
+      iv                  = decoded_token[40,16]
+      encrypted_data      = decoded_token[56..-1]
       @data = decrypt!(encrypted_data, iv)
       signing_blob = [issued_timestamp].pack("Q>") + iv + encrypted_data
-      @regenerated_mac = OpenSSL::HMAC.hexdigest('sha256', secret.signing_key, signing_blob)
+      @regenerated_mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, signing_blob)
     end
 
     def token_recent_enough?
