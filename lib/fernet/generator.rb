@@ -16,7 +16,7 @@ module Fernet
       yield self if block_given?
       iv, encrypted_data = encrypt(data)
       issued_timestamp = Time.now.to_i
-      payload = [issued_timestamp].pack("Q>") + iv + encrypted_data
+      payload = pack_int64_bigendian(issued_timestamp) + iv + encrypted_data
       mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, payload)
       Base64.urlsafe_encode64(mac + payload)
     end
@@ -36,6 +36,10 @@ module Fernet
       cipher.iv  = iv
       cipher.key = secret.encryption_key
       [iv, cipher.update(data) + cipher.final]
+    end
+
+    def pack_int64_bigendian(value)
+      (0..7).map { |index| (value >> (index * 8)) & 0xFF }.reverse.map(&:chr).join
     end
   end
 end

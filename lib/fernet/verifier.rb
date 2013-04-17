@@ -59,12 +59,12 @@ module Fernet
     def deconstruct
       decoded_token       = Base64.urlsafe_decode64(@token)
       @received_signature = decoded_token[0,32]
-      issued_timestamp    = decoded_token[32,8].unpack("Q>*").first
+      issued_timestamp    = unpack_int64_bigendian(decoded_token[32,8])
       @issued_at          = DateTime.strptime(issued_timestamp.to_s, '%s')
       iv                  = decoded_token[40,16]
       encrypted_data      = decoded_token[56..-1]
       @data = decrypt!(encrypted_data, iv)
-      signing_blob = [issued_timestamp].pack("Q>") + iv + encrypted_data
+      signing_blob = pack_int64_bigendian(issued_timestamp) + iv + encrypted_data
       @regenerated_mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, signing_blob)
     end
 
@@ -99,6 +99,15 @@ module Fernet
 
     def now
       DateTime.now
+    end
+
+    def pack_int64_bigendian(value)
+      (0..7).map { |index| (value >> (index * 8)) & 0xFF }.reverse.map(&:chr).join
+    end
+
+    def unpack_int64_bigendian(bytes)
+      bytes.each_byte.to_a.reverse.each_with_index
+        .reduce(0) { |val, (byte, index)| val | (byte << (index * 8)) }
     end
   end
 end
