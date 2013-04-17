@@ -23,13 +23,13 @@ describe Fernet::BitPacking do
     pretty_bytes = pretty(bytes).rjust(20)
     pretty_val = value.to_s.rjust(20)
     bytestr = bytestr(bytes)
-    it "should encode #{pretty_val} to #{pretty_bytes}" do
+    it "encodes #{pretty_val} to #{pretty_bytes}" do
       expect(Fernet::BitPacking.pack_int64_bigendian(value)).to eq(bytestr)
     end
 
     # N.B.: we have two extra spaces in the spec description for
     # aligned formatting w.r.t. the 'encode' specs
-    it "should decode #{pretty_bytes} to #{pretty_val}" do
+    it "decodes #{pretty_bytes} to #{pretty_val}" do
       expect(Fernet::BitPacking.unpack_int64_bigendian(bytestr)).to eq(value)
     end
   end
