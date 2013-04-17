@@ -1,4 +1,5 @@
 require 'fernet/version'
+require 'fernet/bit_packing'
 require 'fernet/generator'
 require 'fernet/verifier'
 require 'fernet/secret'

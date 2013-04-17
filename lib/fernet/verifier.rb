@@ -2,7 +2,6 @@
 require 'base64'
 require 'openssl'
 require 'date'
-require_relative 'bit_packing'
 
 module Fernet
   class Verifier
