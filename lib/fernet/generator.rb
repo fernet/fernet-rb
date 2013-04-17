@@ -2,9 +2,12 @@
 require 'base64'
 require 'openssl'
 require 'date'
+require_relative 'bit_packing'
 
 module Fernet
   class Generator
+    include BitPacking
+
     attr_accessor :data
 
     def initialize(secret)
@@ -16,8 +19,8 @@ module Fernet
       yield self if block_given?
       iv, encrypted_data = encrypt(data)
       issued_timestamp = Time.now.to_i
-      payload = [issued_timestamp].pack("Q") + iv + encrypted_data
-      mac = OpenSSL::HMAC.hexdigest('sha256', secret.signing_key, payload)
+      payload = pack_int64_bigendian(issued_timestamp) + iv + encrypted_data
+      mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, payload)
       Base64.urlsafe_encode64(mac + payload)
     end
 
@@ -37,5 +40,6 @@ module Fernet
       cipher.key = secret.encryption_key
       [iv, cipher.update(data) + cipher.final]
     end
+
   end
 end
