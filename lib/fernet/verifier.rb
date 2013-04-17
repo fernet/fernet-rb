@@ -2,9 +2,12 @@
 require 'base64'
 require 'openssl'
 require 'date'
+require_relative 'bit_packing'
 
 module Fernet
   class Verifier
+    include BitPacking
+
     attr_reader :token
     attr_accessor :ttl, :enforce_ttl
 
@@ -58,14 +61,14 @@ module Fernet
 
     def deconstruct
       decoded_token       = Base64.urlsafe_decode64(@token)
-      @received_signature = decoded_token[0,64]
-      issued_timestamp    = decoded_token[64,8].unpack("Q").first
+      @received_signature = decoded_token[0,32]
+      issued_timestamp    = unpack_int64_bigendian(decoded_token[32,8])
       @issued_at          = DateTime.strptime(issued_timestamp.to_s, '%s')
-      iv                  = decoded_token[72,16]
-      encrypted_data      = decoded_token[88..-1]
+      iv                  = decoded_token[40,16]
+      encrypted_data      = decoded_token[56..-1]
       @data = decrypt!(encrypted_data, iv)
-      signing_blob = [issued_timestamp].pack("Q") + iv + encrypted_data
-      @regenerated_mac = OpenSSL::HMAC.hexdigest('sha256', secret.signing_key, signing_blob)
+      signing_blob = pack_int64_bigendian(issued_timestamp) + iv + encrypted_data
+      @regenerated_mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, signing_blob)
     end
 
     def token_recent_enough?
