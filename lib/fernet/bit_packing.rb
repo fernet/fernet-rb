@@ -1,5 +1,6 @@
 module Fernet
   module BitPacking
+    extend self
 
     # N.B. Ruby 1.9.2 and below silently ignore endianness specifiers in
     # packing/unpacking format directives; we work around it with this
