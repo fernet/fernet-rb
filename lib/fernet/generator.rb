@@ -2,9 +2,12 @@
 require 'base64'
 require 'openssl'
 require 'date'
+require_relative 'bit_packing'
 
 module Fernet
   class Generator
+    include BitPacking
+
     attr_accessor :data
 
     def initialize(secret)
@@ -38,8 +41,5 @@ module Fernet
       [iv, cipher.update(data) + cipher.final]
     end
 
-    def pack_int64_bigendian(value)
-      (0..7).map { |index| (value >> (index * 8)) & 0xFF }.reverse.map(&:chr).join
-    end
   end
 end
