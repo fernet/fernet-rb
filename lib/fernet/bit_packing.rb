@@ -11,8 +11,8 @@ module Fernet
     end
 
     def unpack_int64_bigendian(bytes)
-      bytes.each_byte.to_a.reverse.each_with_index
-        .reduce(0) { |val, (byte, index)| val | (byte << (index * 8)) }
+      bytes.each_byte.to_a.reverse.each_with_index.
+        reduce(0) { |val, (byte, index)| val | (byte << (index * 8)) }
     end
   end
 end
