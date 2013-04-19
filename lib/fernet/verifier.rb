@@ -5,7 +5,6 @@ require 'date'
 
 module Fernet
   class Verifier
-    include BitPacking
 
     attr_reader :token
     attr_accessor :ttl, :enforce_ttl
@@ -61,12 +60,13 @@ module Fernet
     def deconstruct
       decoded_token       = Base64.urlsafe_decode64(@token)
       @received_signature = decoded_token[0,32]
-      issued_timestamp    = unpack_int64_bigendian(decoded_token[32,8])
+      issued_timestamp    = BitPacking.unpack_int64_bigendian(decoded_token[32,8])
       @issued_at          = DateTime.strptime(issued_timestamp.to_s, '%s')
       iv                  = decoded_token[40,16]
       encrypted_data      = decoded_token[56..-1]
       @data = decrypt!(encrypted_data, iv)
-      signing_blob = pack_int64_bigendian(issued_timestamp) + iv + encrypted_data
+      signing_blob = BitPacking.pack_int64_bigendian(issued_timestamp) +
+        iv + encrypted_data
       @regenerated_mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, signing_blob)
     end
 
