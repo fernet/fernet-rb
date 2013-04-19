@@ -12,8 +12,8 @@ end
 Fernet::Configuration.run
 
 module Fernet
-  def self.generate(secret, &block)
-    Generator.new(secret).generate(&block)
+  def self.generate(secret, message = '', &block)
+    Generator.new(secret, message).generate(&block)
   end
 
   def self.verify(secret, token, &block)

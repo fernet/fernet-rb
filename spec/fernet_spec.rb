@@ -19,6 +19,15 @@ describe Fernet do
     ).to be_true
   end
 
+  it 'can generate tokens without a proc' do
+    token = Fernet.generate(secret, 'harold@heroku.com')
+    expect(
+      Fernet.verify(secret, token) do |verifier|
+        verifier.data == 'harold@heroku.com'
+      end
+    ).to be_true
+  end
+
   it 'fails with a bad secret' do
     token = Fernet.generate(secret) do |generator|
       generator.data = 'harold@heroku.com'

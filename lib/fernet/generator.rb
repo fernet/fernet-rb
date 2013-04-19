@@ -8,9 +8,9 @@ module Fernet
 
     attr_accessor :data
 
-    def initialize(secret)
-      @secret  = Secret.new(secret)
-      @data    = ''
+    def initialize(secret, data = '')
+      @secret = Secret.new(secret)
+      @data   = data
     end
 
     def generate
