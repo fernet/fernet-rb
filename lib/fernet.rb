@@ -12,6 +12,8 @@ end
 Fernet::Configuration.run
 
 module Fernet
+  TOKEN_VERSION = 0x80.freeze
+
   def self.generate(secret, message = '', &block)
     Generator.new(secret, message).generate(&block)
   end

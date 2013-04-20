@@ -5,7 +5,6 @@ require 'date'
 
 module Fernet
   class Generator
-
     attr_accessor :data
 
     def initialize(secret, data = '')
@@ -20,7 +19,8 @@ module Fernet
       payload = BitPacking.pack_int64_bigendian(issued_timestamp) +
         iv + encrypted_data
       mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, payload)
-      Base64.urlsafe_encode64(mac + payload)
+      [Fernet::TOKEN_VERSION].pack("C") +
+        Base64.urlsafe_encode64(payload + mac)
     end
 
     def inspect
