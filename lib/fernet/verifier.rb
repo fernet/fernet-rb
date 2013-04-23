@@ -59,7 +59,7 @@ module Fernet
     end
 
     def deconstruct
-      version = @token[0].to_s.unpack("C").first
+      version = @token[0].chr.unpack("C").first
       if version == Fernet::TOKEN_VERSION
         decoded_token       = Base64.urlsafe_decode64(@token[1..-1])
         @received_signature = decoded_token[(decoded_token.length - 32), 32]
