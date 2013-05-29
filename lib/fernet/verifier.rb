@@ -59,16 +59,16 @@ module Fernet
     end
 
     def deconstruct
-      version = @token[0].chr.unpack("C").first
+      decoded_token = Base64.urlsafe_decode64(@token)
+      version = decoded_token.chr.unpack("C").first
       if version == Fernet::TOKEN_VERSION
-        decoded_token       = Base64.urlsafe_decode64(@token[1..-1])
         @received_signature = decoded_token[(decoded_token.length - 32), 32]
-        issued_timestamp    = BitPacking.unpack_int64_bigendian(decoded_token[0, 8])
+        issued_timestamp    = BitPacking.unpack_int64_bigendian(decoded_token[1, 8])
         @issued_at          = DateTime.strptime(issued_timestamp.to_s, '%s')
-        iv                  = decoded_token[8, 16]
-        encrypted_data      = decoded_token[24..(decoded_token.length - 33)]
+        iv                  = decoded_token[9, 16]
+        encrypted_data      = decoded_token[25..(decoded_token.length - 33)]
         @data = decrypt!(encrypted_data, iv)
-        signing_blob = BitPacking.pack_int64_bigendian(issued_timestamp) +
+        signing_blob = [Fernet::TOKEN_VERSION].pack("C") + BitPacking.pack_int64_bigendian(issued_timestamp) +
           iv + encrypted_data
         @regenerated_mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, signing_blob)
       else

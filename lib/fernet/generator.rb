@@ -16,10 +16,10 @@ module Fernet
       yield self if block_given?
       iv, encrypted_data = encrypt
       issued_timestamp = Time.now.to_i
-      payload = BitPacking.pack_int64_bigendian(issued_timestamp) +
+      payload = [Fernet::TOKEN_VERSION].pack("C") +
+        BitPacking.pack_int64_bigendian(issued_timestamp) +
         iv + encrypted_data
       mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, payload)
-      [Fernet::TOKEN_VERSION].pack("C") +
         Base64.urlsafe_encode64(payload + mac)
     end
 
