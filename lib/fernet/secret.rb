@@ -11,11 +11,11 @@ module Fernet
     end
 
     def encryption_key
-      @secret.byteslice(16, 16)
+      @secret.slice(16, 16)
     end
 
     def signing_key
-      @secret.byteslice(0, 16)
+      @secret.slice(0, 16)
     end
   end
 end
