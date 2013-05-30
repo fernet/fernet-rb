@@ -7,9 +7,9 @@ module Fernet
   class Generator
     attr_accessor :message
 
-    def initialize(secret, message = '')
-      @secret  = Secret.new(secret)
-      @message = message
+    def initialize(opts)
+      @secret  = Secret.new(opts.fetch(:secret))
+      @message = opts[:message]
     end
 
     def generate
