@@ -29,7 +29,7 @@ module Fernet
     alias to_s inspect
 
     def data=(message)
-      puts "[WARNING] 'data' is deprecated, use 'message' instaed"
+      puts "[WARNING] 'data' is deprecated, use 'message' instead"
       @message = message
     end
 
