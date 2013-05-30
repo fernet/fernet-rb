@@ -9,12 +9,12 @@ describe Fernet do
 
   it 'can verify tokens it generates' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = 'harold@heroku.com'
+      generator.message = 'harold@heroku.com'
     end
 
     expect(
       Fernet.verify(secret, token) do |verifier|
-        verifier.data == 'harold@heroku.com'
+        verifier.message == 'harold@heroku.com'
       end
     ).to be_true
   end
@@ -23,26 +23,26 @@ describe Fernet do
     token = Fernet.generate(secret, 'harold@heroku.com')
     expect(
       Fernet.verify(secret, token) do |verifier|
-        verifier.data == 'harold@heroku.com'
+        verifier.message == 'harold@heroku.com'
       end
     ).to be_true
   end
 
   it 'fails with a bad secret' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = 'harold@heroku.com'
+      generator.message = 'harold@heroku.com'
     end
 
     expect(
       Fernet.verify(bad_secret, token) do |verifier|
-        verifier.data == 'harold@heroku.com'
+        verifier.message == 'harold@heroku.com'
       end
     ).to be_false
   end
 
   it 'fails if the token is too old' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = 'harold@heroku.com'
+      generator.message = 'harold@heroku.com'
     end
 
     expect(
@@ -65,7 +65,7 @@ describe Fernet do
     end
 
     token = Fernet.generate(secret) do |generator|
-      generator.data = 'harold@heroku.com'
+      generator.message = 'harold@heroku.com'
     end
 
     expect(
@@ -84,7 +84,7 @@ describe Fernet do
     end
 
     token = Fernet.generate(secret) do |generator|
-      generator.data = 'harold@heroku.com'
+      generator.message = 'harold@heroku.com'
     end
 
     expect(
@@ -98,13 +98,13 @@ describe Fernet do
 
   it 'encrypts the payload' do
     token = Fernet.generate(secret) do |generator|
-      generator.data = 'password1'
+      generator.message = 'password1'
     end
 
     expect(Base64.decode64(token)).not_to match /password1/
 
     Fernet.verify(secret, token) do |verifier|
-      expect(verifier.data).to eq('password1')
+      expect(verifier.message).to eq('password1')
     end
   end
 
@@ -114,12 +114,12 @@ describe Fernet do
       config.ttl = 0
     end
     token = Fernet.generate(secret) do |generator|
-      generator.data = 'password1'
+      generator.message = 'password1'
     end
     verifier = Fernet.verifier(secret, token)
     verifier.enforce_ttl = false
     expect(verifier.valid?).to be_true
-    expect(verifier.data).to eq('password1')
+    expect(verifier.message).to eq('password1')
   end
 
   it 'allows overriding enforce_ttl on verifier block' do
@@ -128,12 +128,12 @@ describe Fernet do
       config.ttl = 0
     end
     token = Fernet.generate(secret) do |generator|
-      generator.data = 'password1'
+      generator.message = 'password1'
     end
     verifier = Fernet.verifier(secret, token) do |v|
       v.enforce_ttl = false
     end
-    expect(verifier.data).to eq('password1')
+    expect(verifier.message).to eq('password1')
     expect(verifier.valid?).to be_true
   end
 end

@@ -5,28 +5,33 @@ require 'date'
 
 module Fernet
   class Generator
-    attr_accessor :data
+    attr_accessor :message
 
-    def initialize(secret, data = '')
-      @secret = Secret.new(secret)
-      @data   = data
+    def initialize(secret, message = '')
+      @secret  = Secret.new(secret)
+      @message = message
     end
 
     def generate
       yield self if block_given?
-      iv, encrypted_data = encrypt
+      iv, encrypted_message = encrypt
       issued_timestamp = Time.now.to_i
       payload = [Fernet::TOKEN_VERSION].pack("C") +
         BitPacking.pack_int64_bigendian(issued_timestamp) +
-        iv + encrypted_data
+        iv + encrypted_message
       mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, payload)
         Base64.urlsafe_encode64(payload + mac)
     end
 
     def inspect
-      "#<Fernet::Generator @secret=[masked] @data=#{@data.inspect}>"
+      "#<Fernet::Generator @secret=[masked] @message=#{@message.inspect}>"
     end
     alias to_s inspect
+
+    def data=(message)
+      puts "[WARNING] 'data' is deprecated, use 'message' instaed"
+      @message = message
+    end
 
   private
     attr_reader :secret
@@ -37,7 +42,7 @@ module Fernet
       iv         = cipher.random_iv
       cipher.iv  = iv
       cipher.key = secret.encryption_key
-      [iv, cipher.update(self.data) + cipher.final]
+      [iv, cipher.update(self.message) + cipher.final]
     end
 
   end

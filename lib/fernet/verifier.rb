@@ -31,9 +31,14 @@ module Fernet
       @valid
     end
 
-    def data
+    def message
       verify if must_verify?
-      @data
+      @message
+    end
+
+    def data
+      puts "[WARNING] data is deprected. Use message instead"
+      message
     end
 
     def ttl=(new_ttl)
@@ -47,7 +52,7 @@ module Fernet
     end
 
     def inspect
-      "#<Fernet::Verifier @secret=[masked] @token=#{@token} @data=#{@data.inspect} @ttl=#{@ttl} @enforce_ttl=#{@enforce_ttl}>"
+      "#<Fernet::Verifier @secret=[masked] @token=#{@token} @message=#{@message.inspect} @ttl=#{@ttl} @enforce_ttl=#{@enforce_ttl}>"
     end
     alias to_s inspect
 
@@ -66,10 +71,10 @@ module Fernet
         issued_timestamp    = BitPacking.unpack_int64_bigendian(decoded_token[1, 8])
         @issued_at          = DateTime.strptime(issued_timestamp.to_s, '%s')
         iv                  = decoded_token[9, 16]
-        encrypted_data      = decoded_token[25..(decoded_token.length - 33)]
-        @data = decrypt!(encrypted_data, iv)
+        encrypted_message      = decoded_token[25..(decoded_token.length - 33)]
+        @message = decrypt!(encrypted_message, iv)
         signing_blob = [Fernet::TOKEN_VERSION].pack("C") + BitPacking.pack_int64_bigendian(issued_timestamp) +
-          iv + encrypted_data
+          iv + encrypted_message
         @regenerated_mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, signing_blob)
       else
         raise UnknownTokenVersion
@@ -93,12 +98,12 @@ module Fernet
       end.zero?
     end
 
-    def decrypt!(encrypted_data, iv)
+    def decrypt!(encrypted_message, iv)
       decipher = OpenSSL::Cipher.new('AES-128-CBC')
       decipher.decrypt
       decipher.iv  = iv
       decipher.key = secret.encryption_key
-      decipher.update(encrypted_data) + decipher.final
+      decipher.update(encrypted_message) + decipher.final
     end
 
     def enforce_ttl?
