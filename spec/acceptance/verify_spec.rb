@@ -26,4 +26,26 @@ describe Fernet::Verifier do
       ).to eq(message)
     end
   end
+
+  context 'invalid tokens' do
+    path = File.expand_path(
+      './../../../fernet-spec/invalid.json', File.dirname(__FILE__)
+    )
+    invalid_json = JSON.parse(File.read(path))
+    invalid_json.each do |test_data|
+      it "detects #{test_data['desc']}" do
+        token  = test_data['token']
+        ttl    = test_data['ttl_sec']
+        now    = DateTime.parse(test_data['now'])
+        secret = test_data['secret']
+
+        verifier = Fernet::Verifier.new(token: token,
+                                        secret: secret,
+                                        now: now,
+                                        ttl: ttl)
+        expect(verifier.valid?).to be_false
+      end
+    end
+  end
+
 end

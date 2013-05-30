@@ -7,6 +7,8 @@ module Fernet
   class Verifier
     class UnknownTokenVersion < RuntimeError; end
 
+    MAX_CLOCK_SKEW = 60.freeze
+
     attr_reader :token
     attr_accessor :ttl, :enforce_ttl
 
@@ -28,8 +30,12 @@ module Fernet
     end
 
     def valid?
-      verify if must_verify?
-      @valid
+      begin
+        verify if must_verify?
+        @valid
+      rescue
+        false
+      end
     end
 
     def message
@@ -70,7 +76,7 @@ module Fernet
       if version == Fernet::TOKEN_VERSION
         @received_signature = decoded_token[(decoded_token.length - 32), 32]
         issued_timestamp    = BitPacking.unpack_int64_bigendian(decoded_token[1, 8])
-        @issued_at          = DateTime.strptime(issued_timestamp.to_s, '%s')
+        @issued_at          = Time.at(issued_timestamp).to_date
         iv                  = decoded_token[9, 16]
         encrypted_message      = decoded_token[25..(decoded_token.length - 33)]
         @message = decrypt!(encrypted_message, iv)
@@ -85,10 +91,17 @@ module Fernet
     def token_recent_enough?
       if enforce_ttl?
         good_till = @issued_at + (ttl.to_f / 24 / 60 / 60)
-        good_till > now
+        (good_till > now) && acceptable_clock_skew?
       else
         true
       end
+    end
+
+    def acceptable_clock_skew?
+      puts "@issued_at: #{@issued_at}\nnow: #{now}\nnow + MAX_CLOCK_SKEW: #{now + MAX_CLOCK_SKEW}"
+      puts now
+      puts now + MAX_CLOCK_SKEW
+      @issued_at < (now + MAX_CLOCK_SKEW)
     end
 
     def signatures_match?
