@@ -6,7 +6,7 @@ require 'base64'
 describe Fernet::Generator do
   it 'generates tokens according to the spec' do
     path = File.expand_path(
-      './../../../fernet-spec/generate.json', File.dirname(__FILE__)
+      './../fernet-spec/generate.json', File.dirname(__FILE__)
     )
     generate_json  = JSON.parse(File.read(path))
     generate_json.each do |test_data|

@@ -6,7 +6,7 @@ require 'base64'
 describe Fernet::Verifier do
   it 'verifies tokens according to the spec' do
     path = File.expand_path(
-      './../../../fernet-spec/verify.json', File.dirname(__FILE__)
+      './../fernet-spec/verify.json', File.dirname(__FILE__)
     )
     verify_json  = JSON.parse(File.read(path))
 
@@ -29,7 +29,7 @@ describe Fernet::Verifier do
 
   context 'invalid tokens' do
     path = File.expand_path(
-      './../../../fernet-spec/invalid.json', File.dirname(__FILE__)
+      './../fernet-spec/invalid.json', File.dirname(__FILE__)
     )
     invalid_json = JSON.parse(File.read(path))
     invalid_json.each do |test_data|
