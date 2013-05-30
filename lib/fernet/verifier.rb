@@ -10,8 +10,8 @@ module Fernet
     attr_reader :token
     attr_accessor :ttl, :enforce_ttl
 
-    def initialize(secret, opts = {})
-      @secret      = Secret.new(secret)
+    def initialize(opts = {})
+      @secret      = Secret.new(opts.fetch(:secret))
       @ttl         = Configuration.ttl
       @enforce_ttl = Configuration.enforce_ttl
       @token       = opts[:token]
