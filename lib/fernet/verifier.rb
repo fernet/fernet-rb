@@ -12,9 +12,10 @@ module Fernet
 
     def initialize(opts = {})
       @secret      = Secret.new(opts.fetch(:secret))
-      @ttl         = Configuration.ttl
+      @ttl         = opts[:ttl] || Configuration.ttl
       @enforce_ttl = Configuration.enforce_ttl
       @token       = opts[:token]
+      @now         = opts[:now]
     end
 
     def verify
@@ -111,7 +112,7 @@ module Fernet
     end
 
     def now
-      DateTime.now
+      @now ||= DateTime.now
     end
   end
 end
