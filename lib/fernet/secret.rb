@@ -1,20 +1,21 @@
+require 'base64'
 module Fernet
   class Secret
+    class InvalidSecret < RuntimeError; end
+
     def initialize(secret)
-      @secret  = secret
+      @secret = Base64.urlsafe_decode64(secret)
+      unless @secret.bytesize == 32
+        raise InvalidSecret, "Secret must be 32 bytes, instead got #{@secret.bytesize}"
+      end
     end
 
     def encryption_key
-      decoded_secret.slice(decoded_secret.size/2, decoded_secret.size)
+      @secret.byteslice(16, 16)
     end
 
     def signing_key
-      decoded_secret.slice(0, decoded_secret.size/2)
-    end
-
-  private
-    def decoded_secret
-      @decoded_secret ||= Base64.decode64(@secret)
+      @secret.byteslice(0, 16)
     end
   end
 end
