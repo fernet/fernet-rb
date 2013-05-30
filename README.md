@@ -94,6 +94,16 @@ version](https://github.com/kr/fernet) and put together the [Fernet
 spec](https://github.com/kr/fernet-spec) which is used by this project to
 verify interoparability.
 
+### Contributing
+
+Contributions are welcome via github pull requests.
+
+To run the test suite:
+
+* Clone the project
+* Init submodules with `git submodule init`
+* Run the suite: `bundle exec rspec spec`
+
 ## License
 
 Fernet is copyright (c) Harold Giménez and is released under the terms of the
