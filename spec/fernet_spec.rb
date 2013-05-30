@@ -12,20 +12,16 @@ describe Fernet do
       generator.message = 'harold@heroku.com'
     end
 
-    expect(
-      Fernet.verify(secret, token) do |verifier|
-        verifier.message == 'harold@heroku.com'
-      end
-    ).to be_true
+    Fernet.verify(secret, token) do |verifier|
+      expect(verifier.message).to eq('harold@heroku.com')
+    end
   end
 
   it 'can generate tokens without a proc' do
     token = Fernet.generate(secret, 'harold@heroku.com')
-    expect(
-      Fernet.verify(secret, token) do |verifier|
-        verifier.message == 'harold@heroku.com'
-      end
-    ).to be_true
+    Fernet.verify(secret, token) do |verifier|
+      expect(verifier.message).to eq('harold@heroku.com')
+    end
   end
 
   it 'fails with a bad secret' do

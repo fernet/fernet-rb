@@ -98,9 +98,6 @@ module Fernet
     end
 
     def acceptable_clock_skew?
-      puts "@issued_at: #{@issued_at}\nnow: #{now}\nnow + MAX_CLOCK_SKEW: #{now + MAX_CLOCK_SKEW}"
-      puts now
-      puts now + MAX_CLOCK_SKEW
       @issued_at < (now + MAX_CLOCK_SKEW)
     end
 
