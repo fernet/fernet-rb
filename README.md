@@ -5,7 +5,7 @@
 
 Fernet allows you to easily generate and verify **HMAC based authentication
 tokens** for issuing API requests between remote servers. It also **encrypts**
-the message by default, so it can be used to transmit secure data over the wire.
+the message so it can be used to transmit secure data over the wire.
 
 ![Fernet](http://f.cl.ly/items/2d0P3d26271O3p2v253u/photo.JPG)
 
@@ -63,7 +63,6 @@ this in an initializer:
 Fernet::Configuration.run do |config|
   config.enforce_ttl = true
   config.ttl         = 60
-  config.encrypt     = true
 end
 ```
 

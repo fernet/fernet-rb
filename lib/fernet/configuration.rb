@@ -11,14 +11,9 @@ module Fernet
     # (an integer in seconds)
     attr_accessor :ttl
 
-    # Whether to encrypt the payload
-    # (true or false)
-    attr_accessor :encrypt
-
     def self.run
       self.instance.enforce_ttl = true
       self.instance.ttl         = 60
-      self.instance.encrypt     = true
       yield self.instance if block_given?
     end
 
