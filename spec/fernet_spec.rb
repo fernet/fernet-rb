@@ -37,19 +37,11 @@ describe Fernet do
   end
 
   it 'fails if the token is too old' do
-    token = Fernet.generate(secret) do |generator|
-      generator.message = 'harold@heroku.com'
-    end
+    token = Fernet.generate(secret, 'harold@heroku.com', now: Time.now - 61)
 
     expect(
       Fernet.verify(secret, token) do |verifier|
-        verifier.ttl = 1
-
-        def verifier.now
-          now = DateTime.now
-          DateTime.new(now.year, now.month, now.day, now.hour,
-                       now.min, now.sec + 2, now.offset)
-        end
+        verifier.ttl = 60
       end
     ).to be_false
   end
@@ -65,10 +57,7 @@ describe Fernet do
     end
 
     expect(
-      Fernet.verify(secret, token) do |verifier|
-        def verifier.now
-          DateTime.now + 99999999999
-        end
+      Fernet.verify(secret, token, now: Time.now + 9999) do |verifier|
         verifier.enforce_ttl = false
       end
     ).to be_true
@@ -84,18 +73,12 @@ describe Fernet do
     end
 
     expect(
-      Fernet.verify(secret, token) do |verifier|
-        def verifier.now
-          Time.now + 99999999999
-        end
-      end
+      Fernet.verify(secret, token, now: Time.now + 9999999)
     ).to be_true
   end
 
   it 'encrypts the payload' do
-    token = Fernet.generate(secret) do |generator|
-      generator.message = 'password1'
-    end
+    token = Fernet.generate(secret, 'password1')
 
     expect(Base64.decode64(token)).not_to match /password1/
 
