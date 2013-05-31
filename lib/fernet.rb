@@ -10,12 +10,14 @@ Fernet::Configuration.run
 module Fernet
   TOKEN_VERSION = 0x80.freeze
 
-  def self.generate(secret, message = '', &block)
-    Generator.new(secret: secret, message: message).generate(&block)
+  def self.generate(secret, message = '', opts = {}, &block)
+    Generator.new(opts.merge({secret: secret, message: message})).
+      generate(&block)
   end
 
-  def self.verify(secret, token, &block)
-    Verifier.new(secret: secret, token: token).verify(&block)
+  def self.verify(secret, token, opts = {}, &block)
+    Verifier.new(opts.merge({secret: secret, token: token})).
+      verify(&block)
   end
 
   def self.verifier(secret, token, &block)
