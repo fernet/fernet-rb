@@ -15,9 +15,11 @@ describe Fernet do
     Fernet.verify(secret, token) do |verifier|
       expect(verifier.message).to eq('harold@heroku.com')
     end
+
+    expect(Fernet.verifier(secret, token)).to be_valid
   end
 
-  it 'can generate tokens without a proc' do
+  it 'can generate tokens without a bloc' do
     token = Fernet.generate(secret, 'harold@heroku.com')
     Fernet.verify(secret, token) do |verifier|
       expect(verifier.message).to eq('harold@heroku.com')

@@ -13,7 +13,7 @@ describe Fernet::Verifier do
     verify_json.each do |test_data|
       token   = test_data['token']
       ttl     = test_data['ttl_sec']
-      now     = DateTime.parse(test_data['now'])
+      now     = DateTime.parse(test_data['now']).to_time
       secret  = test_data['secret']
       message = test_data['src']
 

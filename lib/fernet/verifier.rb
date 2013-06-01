@@ -74,7 +74,7 @@ module Fernet
       if version == Fernet::TOKEN_VERSION
         @received_signature = decoded_token[(decoded_token.length - 32), 32]
         issued_timestamp    = BitPacking.unpack_int64_bigendian(decoded_token[1, 8])
-        @issued_at          = Time.at(issued_timestamp).to_date
+        @issued_at          = Time.at(issued_timestamp)
         iv                  = decoded_token[9, 16]
         encrypted_message      = decoded_token[25..(decoded_token.length - 33)]
         @message = decrypt!(encrypted_message, iv)
@@ -89,7 +89,7 @@ module Fernet
     def token_recent_enough?
       if enforce_ttl?
         good_till = @issued_at + (ttl.to_f / 24 / 60 / 60)
-        (good_till > now) && acceptable_clock_skew?
+        (good_till.to_i >= now.to_i) && acceptable_clock_skew?
       else
         true
       end
@@ -120,7 +120,7 @@ module Fernet
     end
 
     def now
-      @now ||= DateTime.now
+      @now ||= Time.now
     end
   end
 end
