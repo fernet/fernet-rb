@@ -64,8 +64,6 @@ module Fernet
     alias to_s inspect
 
   private
-    attr_reader :secret
-
     def must_verify?
       @must_verify || @valid.nil?
     end
@@ -82,7 +80,7 @@ module Fernet
         @message = decrypt!(encrypted_message, iv)
         signing_blob = [Fernet::TOKEN_VERSION].pack("C") + BitPacking.pack_int64_bigendian(issued_timestamp) +
           iv + encrypted_message
-        @regenerated_mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, signing_blob)
+        @regenerated_mac = OpenSSL::HMAC.digest('sha256', @secret.signing_key, signing_blob)
       else
         raise UnknownTokenVersion
       end
@@ -113,7 +111,7 @@ module Fernet
       decipher = OpenSSL::Cipher.new('AES-128-CBC')
       decipher.decrypt
       decipher.iv  = iv
-      decipher.key = secret.encryption_key
+      decipher.key = @secret.encryption_key
       decipher.update(encrypted_message) + decipher.final
     end
 

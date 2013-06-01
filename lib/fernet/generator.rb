@@ -21,7 +21,7 @@ module Fernet
       payload = [Fernet::TOKEN_VERSION].pack("C") +
         BitPacking.pack_int64_bigendian(issued_timestamp) +
         @iv + encrypted_message
-      mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, payload)
+      mac = OpenSSL::HMAC.digest('sha256', @secret.signing_key, payload)
       Base64.urlsafe_encode64(payload + mac)
     end
 
@@ -36,14 +36,12 @@ module Fernet
     end
 
   private
-    attr_reader :secret
-
     def encrypt
       cipher = OpenSSL::Cipher.new('AES-128-CBC')
       cipher.encrypt
       @iv ||= cipher.random_iv
       cipher.iv  = @iv
-      cipher.key = secret.encryption_key
+      cipher.key = @secret.encryption_key
       cipher.update(self.message) + cipher.final
     end
 
