@@ -37,7 +37,7 @@ legit:
 ```ruby
 verifier = Fernet.verifier(secret, token)
 if verifier.valid?
-  operate_on(verifier.data) # the original, decrypted data
+  operate_on(verifier.message) # the original, decrypted message
 end
 ```
 
