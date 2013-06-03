@@ -8,7 +8,7 @@ module Fernet
     attr_accessor :message
 
     def initialize(opts)
-      @secret  = Secret.new(opts.fetch(:secret))
+      @secret  = opts.fetch(:secret)
       @message = opts[:message]
       @iv      = opts[:iv]
       @now     = opts[:now]
@@ -16,13 +16,12 @@ module Fernet
 
     def generate
       yield self if block_given?
-      encrypted_message = encrypt
-      issued_timestamp = now.to_i
-      payload = [Fernet::TOKEN_VERSION].pack("C") +
-        BitPacking.pack_int64_bigendian(issued_timestamp) +
-        @iv + encrypted_message
-      mac = OpenSSL::HMAC.digest('sha256', @secret.signing_key, payload)
-      Base64.urlsafe_encode64(payload + mac)
+
+      token = Token.generate(secret:  @secret,
+                             message: @message,
+                             iv:      @iv,
+                             now:     @now)
+      token.to_s
     end
 
     def inspect
@@ -34,20 +33,5 @@ module Fernet
       puts "[WARNING] 'data' is deprecated, use 'message' instead"
       @message = message
     end
-
-  private
-    def encrypt
-      cipher = OpenSSL::Cipher.new('AES-128-CBC')
-      cipher.encrypt
-      @iv ||= cipher.random_iv
-      cipher.iv  = @iv
-      cipher.key = @secret.encryption_key
-      cipher.update(self.message) + cipher.final
-    end
-
-    def now
-      @now ||= Time.now
-    end
-
   end
 end

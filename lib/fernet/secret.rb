@@ -17,5 +17,10 @@ module Fernet
     def signing_key
       @secret.slice(0, 16)
     end
+
+    def to_s
+      "<Fernet::Secret [masked]>"
+    end
+    alias to_s inspect
   end
 end

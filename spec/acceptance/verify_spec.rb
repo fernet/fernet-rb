@@ -36,14 +36,15 @@ describe Fernet::Verifier do
       it "detects #{test_data['desc']}" do
         token  = test_data['token']
         ttl    = test_data['ttl_sec']
-        now    = DateTime.parse(test_data['now'])
+        now    = DateTime.parse(test_data['now']).to_time
         secret = test_data['secret']
 
         verifier = Fernet::Verifier.new(token: token,
                                         secret: secret,
                                         now: now,
                                         ttl: ttl)
-        expect(verifier.valid?).to be_false
+
+        expect { verifier.message }.to raise_error(Fernet::Token::InvalidToken)
       end
     end
   end

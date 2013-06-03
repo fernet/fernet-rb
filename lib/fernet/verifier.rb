@@ -7,55 +7,29 @@ module Fernet
   class Verifier
     class UnknownTokenVersion < RuntimeError; end
 
-    MAX_CLOCK_SKEW = 60.freeze
-
     attr_reader :token
     attr_accessor :ttl, :enforce_ttl
 
     def initialize(opts = {})
-      @secret      = Secret.new(opts.fetch(:secret))
-      @ttl         = opts[:ttl] || Configuration.ttl
-      @enforce_ttl = Configuration.enforce_ttl
-      @token       = opts[:token]
-      @now         = opts[:now]
-    end
-
-    def verify
-      yield self if block_given?
-
-      deconstruct
-
-      @must_verify = false
-      @valid = signatures_match? && token_recent_enough?
+      enforce_ttl = opts.has_key?(:enforce_ttl) ? opts[:enforce_ttl] : Configuration.enforce_ttl
+      @token = Token.new(opts.fetch(:token),
+                           enforce_ttl: enforce_ttl,
+                           ttl: opts[:ttl],
+                           now: opts[:now])
+      @token.secret = opts.fetch(:secret)
     end
 
     def valid?
-      begin
-        verify if must_verify?
-        @valid
-      rescue
-        false
-      end
+      @token.valid?
     end
 
     def message
-      verify if must_verify?
-      @message
+      @token.message
     end
 
     def data
       puts "[WARNING] data is deprected. Use message instead"
       message
-    end
-
-    def ttl=(new_ttl)
-      @must_verify = true
-      @ttl = new_ttl
-    end
-
-    def enforce_ttl=(new_enforce_ttl)
-      @must_verify = true
-      @enforce_ttl = new_enforce_ttl
     end
 
     def inspect
@@ -66,24 +40,6 @@ module Fernet
   private
     def must_verify?
       @must_verify || @valid.nil?
-    end
-
-    def deconstruct
-      decoded_token = Base64.urlsafe_decode64(@token)
-      version = decoded_token.chr.unpack("C").first
-      if version == Fernet::TOKEN_VERSION
-        @received_signature = decoded_token[(decoded_token.length - 32), 32]
-        issued_timestamp    = BitPacking.unpack_int64_bigendian(decoded_token[1, 8])
-        @issued_at          = Time.at(issued_timestamp)
-        iv                  = decoded_token[9, 16]
-        encrypted_message   = decoded_token[25..(decoded_token.length - 33)]
-        @message = decrypt!(encrypted_message, iv)
-        signing_blob = [Fernet::TOKEN_VERSION].pack("C") + BitPacking.pack_int64_bigendian(issued_timestamp) +
-          iv + encrypted_message
-        @regenerated_mac = OpenSSL::HMAC.digest('sha256', @secret.signing_key, signing_blob)
-      else
-        raise UnknownTokenVersion
-      end
     end
 
     def token_recent_enough?
@@ -105,14 +61,6 @@ module Fernet
       received_bytes.inject(0) do |accum, byte|
         accum |= byte ^ regenerated_bytes.shift
       end.zero?
-    end
-
-    def decrypt!(encrypted_message, iv)
-      decipher = OpenSSL::Cipher.new('AES-128-CBC')
-      decipher.decrypt
-      decipher.iv  = iv
-      decipher.key = @secret.encryption_key
-      decipher.update(encrypted_message) + decipher.final
     end
 
     def enforce_ttl?
