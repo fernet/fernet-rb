@@ -76,7 +76,7 @@ module Fernet
         issued_timestamp    = BitPacking.unpack_int64_bigendian(decoded_token[1, 8])
         @issued_at          = Time.at(issued_timestamp)
         iv                  = decoded_token[9, 16]
-        encrypted_message      = decoded_token[25..(decoded_token.length - 33)]
+        encrypted_message   = decoded_token[25..(decoded_token.length - 33)]
         @message = decrypt!(encrypted_message, iv)
         signing_blob = [Fernet::TOKEN_VERSION].pack("C") + BitPacking.pack_int64_bigendian(issued_timestamp) +
           iv + encrypted_message
