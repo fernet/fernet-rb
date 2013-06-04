@@ -105,6 +105,11 @@ To run the test suite:
 
 Thanks to all [contributors](https://github.com/hgmnz/fernet/contributors).
 
+### Security disclosures
+
+If you find a security issue with Fernet, please report it by emailing
+the fernet security list: fernet-security@googlegroups.com
+
 ## License
 
 Fernet is copyright (c) Harold Giménez and is released under the terms of the
