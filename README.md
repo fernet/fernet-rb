@@ -108,7 +108,7 @@ Thanks to all [contributors](https://github.com/hgmnz/fernet/contributors).
 ### Security disclosures
 
 If you find a security issue with Fernet, please report it by emailing
-the fernet security list: fernet-security@googlegroups.com
+the fernet security list: fernet-secure@googlegroups.com
 
 ## License
 
