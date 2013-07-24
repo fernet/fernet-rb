@@ -89,6 +89,7 @@ module Fernet
     end
 
     def validate
+      super
       if valid_base64?
         if unknown_token_version?
           errors.add :version, "is unknown"
@@ -109,7 +110,6 @@ module Fernet
       else
         errors.add(:token, "invalid base64")
       end
-      super
     end
 
     def regenerated_mac
