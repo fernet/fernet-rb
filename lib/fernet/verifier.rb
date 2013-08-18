@@ -1,5 +1,5 @@
 require 'base64'
-require 'yajl'
+require 'multi_json'
 require 'openssl'
 require 'date'
 
@@ -44,12 +44,12 @@ module Fernet
       parts = @token.split('|')
       if decrypt?
         encrypted_data, iv, @received_signature = *parts
-        @data = Yajl::Parser.parse(decrypt!(encrypted_data, Base64.urlsafe_decode64(iv)))
+        @data = MultiJson.load(decrypt!(encrypted_data, Base64.urlsafe_decode64(iv)))
         signing_blob = "#{encrypted_data}|#{iv}"
       else
         encoded_data, @received_signature = *parts
         signing_blob = encoded_data
-        @data = Yajl::Parser.parse(Base64.urlsafe_decode64(encoded_data))
+        @data = MultiJson.load(Base64.urlsafe_decode64(encoded_data))
       end
       @regenerated_mac = OpenSSL::HMAC.hexdigest('sha256', signing_blob, signing_key)
     end

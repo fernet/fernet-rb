@@ -16,6 +16,7 @@ Gem::Specification.new do |gem|
   gem.version       = Fernet::VERSION
 
   gem.add_dependency "yajl-ruby"
+  gem.add_dependency "multi_json"
 
   gem.add_development_dependency "rspec"
 end
