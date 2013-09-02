@@ -42,15 +42,6 @@ module Fernet
       @must_verify || @valid.nil?
     end
 
-    def token_recent_enough?
-      if enforce_ttl?
-        good_till = @issued_at + (ttl.to_f / 24 / 60 / 60)
-        (good_till.to_i >= now.to_i) && acceptable_clock_skew?
-      else
-        true
-      end
-    end
-
     def acceptable_clock_skew?
       @issued_at < (now + MAX_CLOCK_SKEW)
     end
@@ -61,10 +52,6 @@ module Fernet
       received_bytes.inject(0) do |accum, byte|
         accum |= byte ^ regenerated_bytes.shift
       end.zero?
-    end
-
-    def enforce_ttl?
-      @enforce_ttl
     end
 
     def now
