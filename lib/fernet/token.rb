@@ -92,12 +92,11 @@ module Fernet
       if valid_base64?
         if unknown_token_version?
           errors.add :version, "is unknown"
+        elsif enforce_ttl? && !issued_recent_enough?
+          errors.add :issued_timestamp, "is too far in the past: token expired"
         else
           unless signatures_match?
             errors.add :signature, "does not match"
-          end
-          if enforce_ttl? && !issued_recent_enough?
-            errors.add :issued_timestamp, "is too far in the past: token expired"
           end
           if unacceptable_clock_slew?
             errors.add :issued_timestamp, "is too far in the future"
