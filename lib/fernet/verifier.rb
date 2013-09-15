@@ -14,16 +14,17 @@ module Fernet
     # Internal: initializes a Verifier
     #
     # opts - a hash containing
-    #   token: the fernet token string
+    #   secret: the secret used to create the token (required)
+    #   token: the fernet token string (required)
     #   enforce_ttl: whether to enforce TTL, defaults to Configuration.enforce_ttl
     #   ttl: number of seconds the token is valid
     def initialize(opts = {})
       enforce_ttl = opts.has_key?(:enforce_ttl) ? opts[:enforce_ttl] : Configuration.enforce_ttl
       @token = Token.new(opts.fetch(:token),
+                           secret: opts.fetch(:secret),
                            enforce_ttl: enforce_ttl,
                            ttl: opts[:ttl],
                            now: opts[:now])
-      @token.secret = opts.fetch(:secret)
     end
 
     # Public: whether the verifier is valid. A verifier is valid if it's token

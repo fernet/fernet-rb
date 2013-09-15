@@ -18,11 +18,13 @@ module Fernet
     #
     # token - the string representation of this token
     # opts  - a has containing
+    #   secret: the base64 encoded secret (required)
     #   enforce_ttl: whether to enforce TTL upon validation. Defaults to value
     #                set in Configuration.enforce_ttl
     #   ttl: number of seconds token is valid, defaults to Configuration.ttl
     def initialize(token, opts = {})
       @token       = token
+      @secret      = Secret.new(opts.fetch(:secret))
       @enforce_ttl = opts.fetch(:enforce_ttl) { Configuration.enforce_ttl }
       @ttl         = opts[:ttl] || Configuration.ttl
       @now         = opts[:now]
@@ -31,13 +33,6 @@ module Fernet
     # Internal: returns the token as a string
     def to_s
       @token
-    end
-
-    # Internal: sets this token's secret
-    #
-    # secret - the secret string
-    def secret=(secret)
-      @secret = Secret.new(secret)
     end
 
     # Internal: Validates this token and returns true if it's valid
@@ -76,7 +71,7 @@ module Fernet
       unless opts[:secret]
         raise ArgumentError, 'Secret not provided'
       end
-      secret = Secret.new(opts[:secret])
+      secret = Secret.new(opts.fetch(:secret))
       encrypted_message, iv = Encryption.encrypt(key:     secret.encryption_key,
                                                  message: opts[:message],
                                                  iv:      opts[:iv])
@@ -87,7 +82,7 @@ module Fernet
         iv +
         encrypted_message
       mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, payload)
-      new(Base64.urlsafe_encode64(payload + mac))
+      new(Base64.urlsafe_encode64(payload + mac), secret: opts.fetch(:secret))
     end
 
   private
