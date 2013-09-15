@@ -21,9 +21,9 @@ module Fernet
   #
   #   secret = ...
   #   token = Fernet.generate(secret, 'my secrets')
-  def self.generate(secret, message = '', opts = {}, &block)
+  def self.generate(secret, message = '', opts = {})
     Generator.new(opts.merge({secret: secret, message: message})).
-      generate(&block)
+      generate
   end
 
   # Public: verifies a fernet token
