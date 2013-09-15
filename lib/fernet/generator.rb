@@ -12,7 +12,7 @@ module Fernet
     # Internal: Initializes a generator
     #
     # opts - a hash containing the following keys:
-    #   secret: a string containing a Base64 encoded secret
+    #   secret: a string containing a secret, optionally Base64 encoded
     #   message: the message
     def initialize(opts)
       @secret  = opts.fetch(:secret)
