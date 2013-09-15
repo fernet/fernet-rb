@@ -1,16 +1,32 @@
 require 'singleton'
 module Fernet
+  # Public - singleton class used to globally set various
+  #          configuration defaults
   class Configuration
     include Singleton
 
-    # Whether to enforce a message TTL
-    # (true or false)
+    # Public: Returns whether to enforce a message TTL (true or false)
     attr_accessor :enforce_ttl
 
-    # How long messages are considered valid to the verifier
-    # (an integer in seconds)
+    # Public: Returns how many seconds messages are considered valid for
     attr_accessor :ttl
 
+    # Public: used to configure fernet, typically invoked in an initialization
+    #   routine
+    #
+    # Sets the following values:
+    #
+    # * enforce_ttl: true
+    # * ttl: 60
+    #
+    # Yields the singleton configuration object, where above defaults can be
+    #   overridden
+    #
+    # Examples
+    #
+    # Fernet::Configuration.run do |config|
+    #   config.enforce_ttl = false
+    # end
     def self.run
       self.instance.enforce_ttl = true
       self.instance.ttl         = 60

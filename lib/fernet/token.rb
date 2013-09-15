@@ -3,14 +3,24 @@ require 'base64'
 require 'valcro'
 
 module Fernet
+  # Internal: encapsulates a fernet token structure and validation
   class Token
     include Valcro
 
     class InvalidToken < StandardError; end
 
+    # Internal: the default token version
     DEFAULT_VERSION = 0x80.freeze
+    # Internal: max allowed clock skew for calculating TTL
     MAX_CLOCK_SKEW  = 60.freeze
 
+    # Internal: initializes a Token object
+    #
+    # token - the string representation of this token
+    # opts  - a has containing
+    #   enforce_ttl: whether to enforce TTL upon validation. Defaults to value
+    #                set in Configuration.enforce_ttl
+    #   ttl: number of seconds token is valid, defaults to Configuration.ttl
     def initialize(token, opts = {})
       @token       = token
       @enforce_ttl = opts.fetch(:enforce_ttl) { Configuration.enforce_ttl }
@@ -18,19 +28,31 @@ module Fernet
       @now         = opts[:now]
     end
 
+    # Internal: returns the token as a string
     def to_s
       @token
     end
 
+    # Internal: sets this token's secret
+    #
+    # secret - the secret string
     def secret=(secret)
       @secret = Secret.new(secret)
     end
 
+    # Internal: Validates this token and returns true if it's valid
+    #
+    # Returns a boolean set to true if it's valid, false otherwise
     def valid?
       validate
       super
     end
 
+    # Internal: returns the decrypted message in this token
+    #
+    # Raises InvalidToken if it cannot be decrypted or is invalid
+    #
+    # Returns a string containing the original message in plain text
     def message
       if valid?
         begin
@@ -45,15 +67,20 @@ module Fernet
       end
     end
 
-    def self.generate(params)
-      unless params[:secret]
+    # Internal: generates a Fernet Token
+    #
+    # opts - a hash containing
+    #   secret: a string containing the Base64 encoded secret
+    #   message: the message in plain text
+    def self.generate(opts)
+      unless opts[:secret]
         raise ArgumentError, 'Secret not provided'
       end
-      secret = Secret.new(params[:secret])
+      secret = Secret.new(opts[:secret])
       encrypted_message, iv = Encryption.encrypt(key:     secret.encryption_key,
-                                                 message: params[:message],
-                                                 iv:      params[:iv])
-      issued_timestamp = (params[:now] || Time.now).to_i
+                                                 message: opts[:message],
+                                                 iv:      opts[:iv])
+      issued_timestamp = (opts[:now] || Time.now).to_i
 
       payload = [DEFAULT_VERSION].pack("C") +
         BitPacking.pack_int64_bigendian(issued_timestamp) +
