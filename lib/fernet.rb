@@ -62,7 +62,7 @@ module Fernet
   #   verifier.message
   #   # => raises Fernet::Token::InvalidToken if token too old or invalid
   #
-  # Returns a verifier object, which responds to valid? and message
+  # Returns a verifier object, which responds to `#valid?` and `#message`
   def self.verifier(secret, token, opts = {})
     Verifier.new(opts.merge({secret: secret, token: token}))
   end
