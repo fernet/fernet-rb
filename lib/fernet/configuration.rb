@@ -1,7 +1,7 @@
 require 'singleton'
 module Fernet
-  # Public - singleton class used to globally set various
-  #          configuration defaults
+  # Public: singleton class used to globally set various
+  # configuration defaults
   class Configuration
     include Singleton
 
@@ -24,9 +24,9 @@ module Fernet
     #
     # Examples
     #
-    # Fernet::Configuration.run do |config|
-    #   config.enforce_ttl = false
-    # end
+    #   Fernet::Configuration.run do |config|
+    #     config.enforce_ttl = false
+    #   end
     def self.run
       self.instance.enforce_ttl = true
       self.instance.ttl         = 60

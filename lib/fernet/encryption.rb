@@ -9,17 +9,17 @@ module Fernet
     #   random IV and the provided encryption key
     #
     # opts - a hash containing
-    #   message: the message to encrypt
-    #   key: the encryption key
-    #   iv: override for the random IV, only used for testing
-    #
-    # Returns a two-element array containing the ciphertext and the random IV
+    # * message - the message to encrypt
+    # * key     - the encryption key
+    # * iv      - override for the random IV, only used for testing
     #
     # Examples
     #
-    # ciphertext, iv = Fernet::Encryption.encrypt(
-    #   message: 'this is a secret', key: encryption_key
-    # )
+    #   ciphertext, iv = Fernet::Encryption.encrypt(
+    #     message: 'this is a secret', key: encryption_key
+    #   )
+    #
+    # Returns a two-element array containing the ciphertext and the random IV
     def self.encrypt(opts)
       cipher = OpenSSL::Cipher.new('AES-128-CBC')
       cipher.encrypt
@@ -33,17 +33,17 @@ module Fernet
     #   the provided IV and encryption key
     #
     # opts - a hash containing
-    #   ciphertext: encrypted message
-    #   key: encryption key used to encrypt the message
-    #   iv: initialization vector used in the ciphertext's cipher
-    #
-    # Returns a two-element array containing the ciphertext and the random IV
+    # * ciphertext - encrypted message
+    # * key        - encryption key used to encrypt the message
+    # * iv         - initialization vector used in the ciphertext's cipher
     #
     # Examples
     #
-    # ciphertext, iv = Fernet::Encryption.encrypt(
-    #   message: 'this is a secret', key: encryption_key
-    # )
+    #   ciphertext, iv = Fernet::Encryption.encrypt(
+    #     message: 'this is a secret', key: encryption_key
+    #   )
+    #
+    # Returns a two-element array containing the ciphertext and the random IV
     def self.decrypt(opts)
       decipher = OpenSSL::Cipher.new('AES-128-CBC')
       decipher.decrypt
@@ -55,7 +55,7 @@ module Fernet
     # Internal: Creates an HMAC signature (sha356 hashing) of the given bytes
     #   with the provided signing key
     #
-    # key - the signing key
+    # key   - the signing key
     # bytes - blob of bytes to sign
     #
     # Returns the HMAC signature as a string

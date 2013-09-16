@@ -18,10 +18,11 @@ module Fernet
     #
     # token - the string representation of this token
     # opts  - a has containing
-    #   secret: the secret, optionally base 64 encoded (required)
-    #   enforce_ttl: whether to enforce TTL upon validation. Defaults to value
-    #                set in Configuration.enforce_ttl
-    #   ttl: number of seconds token is valid, defaults to Configuration.ttl
+    # * secret       - the secret, optionally base 64 encoded (required)
+    # * enforce_ttl  - whether to enforce TTL upon validation. Defaults to
+    #                  value set in Configuration.enforce_ttl
+    # * ttl          - number of seconds token is valid, defaults to
+    #                  Configuration.ttl
     def initialize(token, opts = {})
       @token       = token
       @secret      = Secret.new(opts.fetch(:secret))
@@ -65,16 +66,18 @@ module Fernet
     # Internal: generates a Fernet Token
     #
     # opts - a hash containing
-    #   secret: a string containing the secret, optionally base64 encoded
-    #   message: the message in plain text
+    # * secret  - a string containing the secret, optionally base64 encoded
+    # * message - the message in plain text
     def self.generate(opts)
       unless opts[:secret]
         raise ArgumentError, 'Secret not provided'
       end
       secret = Secret.new(opts.fetch(:secret))
-      encrypted_message, iv = Encryption.encrypt(key:     secret.encryption_key,
-                                                 message: opts[:message],
-                                                 iv:      opts[:iv])
+      encrypted_message, iv = Encryption.encrypt(
+        key:     secret.encryption_key,
+        message: opts[:message],
+        iv:      opts[:iv]
+      )
       issued_timestamp = (opts[:now] || Time.now).to_i
 
       payload = [DEFAULT_VERSION].pack("C") +

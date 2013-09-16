@@ -14,10 +14,10 @@ module Fernet
     # Internal: initializes a Verifier
     #
     # opts - a hash containing
-    #   secret: the secret used to create the token (required)
-    #   token: the fernet token string (required)
-    #   enforce_ttl: whether to enforce TTL, defaults to Configuration.enforce_ttl
-    #   ttl: number of seconds the token is valid
+    # * secret      - the secret used to create the token (required)
+    # * token       - the fernet token string (required)
+    # * enforce_ttl - whether to enforce TTL, defaults to Configuration.enforce_ttl
+    # * ttl         - number of seconds the token is valid
     def initialize(opts = {})
       enforce_ttl = opts.has_key?(:enforce_ttl) ? opts[:enforce_ttl] : Configuration.enforce_ttl
       @token = Token.new(opts.fetch(:token),
@@ -46,7 +46,8 @@ module Fernet
       message
     end
 
-    # Public: String representation of this verifier, masks the secret to avoid leaks.
+    # Public: String representation of this verifier, masks the secret to avoid
+    #   leaks
     def inspect
       "#<Fernet::Verifier @secret=[masked] @token=#{@token} @message=#{@message.inspect} @ttl=#{@ttl} @enforce_ttl=#{@enforce_ttl}>"
     end

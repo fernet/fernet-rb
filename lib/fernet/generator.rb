@@ -6,14 +6,14 @@ require 'date'
 module Fernet
   # Internal: Generates Fernet tokens
   class Generator
-    # Returns the token's message
+    # Internal: Returns the token's message
     attr_accessor :message
 
     # Internal: Initializes a generator
     #
     # opts - a hash containing the following keys:
-    #   secret: a string containing a secret, optionally Base64 encoded
-    #   message: the message
+    # * secret  - a string containing a secret, optionally Base64 encoded
+    # * message - the message
     def initialize(opts)
       @secret  = opts.fetch(:secret)
       @message = opts[:message]
@@ -25,17 +25,18 @@ module Fernet
     #
     # Yields itself, useful for setting or overriding the message
     #
-    # Returns the token as a string
-    #
     # Examples
-    # generator = Generator.new(secret: some_secret)
-    # token = generator.generate do |g|
-    #   g.message = 'this is my message'
-    # end
     #
-    # generator = Generator.new(secret: some_secret,
-    #                           message: 'this is my message')
-    # token = generator.generate
+    #   generator = Generator.new(secret: some_secret)
+    #   token = generator.generate do |g|
+    #     g.message = 'this is my message'
+    #   end
+    #
+    #   generator = Generator.new(secret: some_secret,
+    #                             message: 'this is my message')
+    #   token = generator.generate
+    #
+    # Returns the token as a string
     def generate
       yield self if block_given?
 
