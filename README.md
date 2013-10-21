@@ -1,7 +1,7 @@
 # Fernet
 
-[![Build Status](https://secure.travis-ci.org/hgmnz/fernet.png)](http://travis-ci.org/hgmnz/fernet)
-[![Code Climate](https://codeclimate.com/github/hgmnz/fernet.png)](https://codeclimate.com/github/hgmnz/fernet)
+[![Build Status](https://secure.travis-ci.org/fernet/fernet-rb.png)](http://travis-ci.org/fernet/fernet-rb)
+[![Code Climate](https://codeclimate.com/github/fernet/fernet-rb.png)](https://codeclimate.com/github/fernet/fernet-rb)
 
 Fernet allows you to easily generate and verify **HMAC based authentication
 tokens** for issuing API requests between remote servers. It also **encrypts**
