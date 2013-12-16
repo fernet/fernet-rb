@@ -1,3 +1,3 @@
 module Fernet
-  VERSION = "2.0.rc2"
+  VERSION = "2.0"
 end
