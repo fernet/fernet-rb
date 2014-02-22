@@ -42,7 +42,7 @@ module Fernet
 
     # Deprecated: returns the token's message
     def data
-      puts "[WARNING] data is deprected. Use message instead"
+      puts "[WARNING] data is deprecated. Use message instead"
       message
     end
 
