@@ -13,7 +13,7 @@ describe Fernet::Token, 'validation' do
 
     token = Fernet::Token.new(generated.to_s, secret: secret)
 
-    expect(token.valid?).to be_false
+    expect(token.valid?).to eq(false)
     expect(token.errors[:signature]).to include("does not match")
   end
 
@@ -24,7 +24,7 @@ describe Fernet::Token, 'validation' do
     token = Fernet::Token.new(generated.to_s, enforce_ttl: true,
                                               ttl: 60,
                                               secret: secret)
-    expect(token.valid?).to be_false
+    expect(token.valid?).to eq(false)
     expect(token.errors[:issued_timestamp]).to include("is too far in the past: token expired")
   end
 
@@ -34,21 +34,21 @@ describe Fernet::Token, 'validation' do
                                        now:     Time.at(Time.now.to_i + 61))
     token = Fernet::Token.new(generated.to_s, secret: secret)
 
-    expect(token.valid?).to be_false
+    expect(token.valid?).to eq(false)
     expect(token.errors[:issued_timestamp]).to include("is too far in the future")
   end
 
   it 'is invalid with bad base64' do
     token = Fernet::Token.new('bad', secret: secret)
 
-    expect(token.valid?).to be_false
+    expect(token.valid?).to eq(false)
     expect(token.errors[:token]).to include("invalid base64")
   end
 
   it 'is invalid with an unknown token version' do
     token = Fernet::Token.new(Base64.urlsafe_encode64("xxxxxx"), secret: secret)
 
-    expect(token.valid?).to be_false
+    expect(token.valid?).to eq(false)
     expect(token.errors[:version]).to include("is unknown")
   end
 end
