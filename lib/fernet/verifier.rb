@@ -2,11 +2,12 @@
 require 'base64'
 require 'openssl'
 require 'date'
+require_relative 'errors'
 
 module Fernet
   # Public: verifies Fernet Tokens
   class Verifier
-    class UnknownTokenVersion < RuntimeError; end
+    class UnknownTokenVersion < Fernet::Error; end
 
     attr_reader :token
     attr_accessor :ttl, :enforce_ttl

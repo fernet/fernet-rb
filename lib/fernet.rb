@@ -1,3 +1,4 @@
+require 'fernet/errors'
 require 'fernet/version'
 require 'fernet/bit_packing'
 require 'fernet/encryption'

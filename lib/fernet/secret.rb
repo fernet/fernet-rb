@@ -1,10 +1,11 @@
 require 'base64'
+require_relative 'errors'
 
 module Fernet
   # Internal: Encapsulates a secret key, a 32-byte sequence consisting
   #   of an encryption and a signing key.
   class Secret
-    class InvalidSecret < RuntimeError; end
+    class InvalidSecret < Fernet::Error; end
 
     # Internal - Initialize a Secret
     #

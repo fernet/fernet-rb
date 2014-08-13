@@ -1,13 +1,14 @@
 # encoding UTF-8
 require 'base64'
 require 'valcro'
+require_relative 'errors'
 
 module Fernet
   # Internal: encapsulates a fernet token structure and validation
   class Token
     include Valcro
 
-    class InvalidToken < StandardError; end
+    class InvalidToken < Fernet::Error; end
 
     # Internal: the default token version
     DEFAULT_VERSION = 0x80.freeze
