@@ -81,7 +81,8 @@ module Fernet
       )
       issued_timestamp = (opts[:now] || Time.now).to_i
 
-      payload = [DEFAULT_VERSION].pack("C") +
+      version = opts[:version] || DEFAULT_VERSION
+      payload = [version].pack("C") +
         BitPacking.pack_int64_bigendian(issued_timestamp) +
         iv +
         encrypted_message

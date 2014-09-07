@@ -46,10 +46,15 @@ describe Fernet::Token, 'validation' do
   end
 
   it 'is invalid with an unknown token version' do
-    token = Fernet::Token.new(Base64.urlsafe_encode64("xxxxxx"), secret: secret)
+    invalid1 = Fernet::Token.generate(message: 'message', version: 0x00, secret: secret)
+    invalid2 = Fernet::Token.generate(message: 'message', version: 0x81, secret: secret)
+    valid    = Fernet::Token.generate(message: 'message', secret: secret)
 
-    expect(token.valid?).to eq(false)
-    expect(token.errors[:version]).to include("is unknown")
+    [invalid1, invalid2].each do |token|
+      expect(token.valid?).to eq(false)
+      expect(token.errors[:version]).to include("is unknown")
+    end
+    expect(valid.valid?).to eq(true)
   end
 end
 
