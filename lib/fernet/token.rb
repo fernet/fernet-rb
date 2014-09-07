@@ -149,8 +149,7 @@ module Fernet
     end
 
     def valid_base64?
-      decoded_token
-      true
+      !decoded_token.nil?
     rescue ArgumentError
       false
     end

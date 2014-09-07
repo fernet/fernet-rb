@@ -56,6 +56,20 @@ describe Fernet::Token, 'validation' do
     end
     expect(valid.valid?).to eq(true)
   end
+
+  it 'is invalid with bad base64 encodings' do
+    token = Fernet::Token.generate(message: 'message', secret: secret)
+    invalid = Fernet::Token.new("\n#{token}", secret: secret)
+
+    ["\n#{token}", "#{token} ", "#{token}+",
+      token.to_s.gsub(/(.)$/, "1"),
+      token.to_s.gsub(/(.)$/, "+"),
+      token.to_s.gsub(/(.)$/, "\\"),
+    ].each do |invalid_string|
+      invalid = Fernet::Token.new(invalid_string, secret: secret)
+      expect(invalid.valid?).to be(false)
+    end
+  end
 end
 
 describe Fernet::Token, 'message' do
