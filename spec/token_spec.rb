@@ -9,7 +9,7 @@ describe Fernet::Token, 'validation' do
                                        message: 'hello')
 
     bogus_hmac = "1" * 32
-    Fernet::Encryption.stub(hmac_digest: bogus_hmac)
+    allow(Fernet::Encryption).to receive(:hmac_digest).and_return(bogus_hmac)
 
     token = Fernet::Token.new(generated.to_s, secret: secret)
 
