@@ -53,26 +53,5 @@ module Fernet
       "#<Fernet::Verifier @secret=[masked] @token=#{@token} @message=#{@message.inspect} @ttl=#{@ttl} @enforce_ttl=#{@enforce_ttl}>"
     end
     alias to_s inspect
-
-  private
-    def must_verify?
-      @must_verify || @valid.nil?
-    end
-
-    def acceptable_clock_skew?
-      @issued_at < (now + MAX_CLOCK_SKEW)
-    end
-
-    def signatures_match?
-      regenerated_bytes = @regenerated_mac.bytes.to_a
-      received_bytes    = @received_signature.bytes.to_a
-      received_bytes.inject(0) do |accum, byte|
-        accum |= byte ^ regenerated_bytes.shift
-      end.zero?
-    end
-
-    def now
-      @now ||= Time.now
-    end
   end
 end
