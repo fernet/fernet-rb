@@ -67,7 +67,7 @@ describe Fernet do
       config.ttl = 0
     end
     token = Fernet.generate(secret, 'password1')
-    verifier = Fernet.verifier(secret, token)
+    verifier = Fernet.verifier(secret, token, now: Time.now + 999999)
     verifier.enforce_ttl = false
     expect(verifier.valid?).to eq(true)
     expect(verifier.message).to eq('password1')

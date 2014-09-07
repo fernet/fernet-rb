@@ -9,8 +9,8 @@ module Fernet
   class Verifier
     class UnknownTokenVersion < Fernet::Error; end
 
-    attr_reader :token
-    attr_accessor :ttl, :enforce_ttl
+    attr_reader :token, :enforce_ttl
+    attr_accessor :ttl
 
     # Internal: initializes a Verifier
     #
@@ -20,12 +20,9 @@ module Fernet
     # * enforce_ttl - whether to enforce TTL, defaults to Configuration.enforce_ttl
     # * ttl         - number of seconds the token is valid
     def initialize(opts = {})
-      enforce_ttl = opts.has_key?(:enforce_ttl) ? opts[:enforce_ttl] : Configuration.enforce_ttl
-      @token = Token.new(opts.fetch(:token),
-                           secret: opts.fetch(:secret),
-                           enforce_ttl: enforce_ttl,
-                           ttl: opts[:ttl],
-                           now: opts[:now])
+      @enforce_ttl = opts.has_key?(:enforce_ttl) ? opts[:enforce_ttl] : Configuration.enforce_ttl
+      @opts = opts
+      create_token!
     end
 
     # Public: whether the verifier is valid. A verifier is valid if it's token
@@ -53,5 +50,22 @@ module Fernet
       "#<Fernet::Verifier @secret=[masked] @token=#{@token} @message=#{@message.inspect} @ttl=#{@ttl} @enforce_ttl=#{@enforce_ttl}>"
     end
     alias to_s inspect
+
+    # Public: sets the enforce_ttl configuration
+    #
+    # * val - whether to enforce TTL, defaults to Configuration.enforce_ttl
+    def enforce_ttl=(val)
+      @enforce_ttl = val
+      create_token!
+    end
+
+  private
+    def create_token!
+      @token = Token.new(@opts.fetch(:token),
+                           secret: @opts.fetch(:secret),
+                           enforce_ttl: enforce_ttl,
+                           ttl: @opts[:ttl],
+                           now: @opts[:now])
+    end
   end
 end
