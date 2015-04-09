@@ -26,7 +26,12 @@ module Fernet
       iv = opts[:iv] || cipher.random_iv
       cipher.iv  = iv
       cipher.key = opts[:key]
-      [cipher.update(opts[:message]) + cipher.final, iv]
+      ciphertext = ""
+      if opts[:message] && !opts[:message].empty?
+        ciphertext += cipher.update(opts[:message])
+      end
+      ciphertext += cipher.final
+      [ciphertext, iv]
     end
 
     # Internal: Decrypts the provided ciphertext using a AES-128-CBC cipher with a

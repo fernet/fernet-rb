@@ -95,4 +95,12 @@ describe Fernet::Token, 'message' do
 
     expect(token.message).to eq('hello')
   end
+
+  it 'correctly handles an empty message' do
+    token = Fernet::Token.generate(secret: secret,
+                                   message: '')
+    token.valid? or raise "invalid token"
+
+    expect(token.message).to eq('')
+  end
 end
