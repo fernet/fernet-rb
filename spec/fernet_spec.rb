@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'spec_helper'
 require 'fernet'
 
@@ -8,11 +10,13 @@ describe Fernet do
   let(:bad_secret) { 'badICDH6x3M7duQeM8dJEMK4Y5TkBIsYDw1lPy35RiY=' }
 
   it 'can verify tokens it generates' do
-    token = Fernet.generate(secret, 'harold@heroku.com')
+    ['harold@heroku.com', '12345', 'weird!@#$%^&*()chars', 'more weird chars §§§§'].each do |plain|
+      token = Fernet.generate(secret, plain)
 
-    verifier = Fernet.verifier(secret, token)
-    expect(verifier).to be_valid
-    expect(verifier.message).to eq('harold@heroku.com')
+      verifier = Fernet.verifier(secret, token)
+      expect(verifier).to be_valid
+      expect(verifier.message).to eq(plain)
+    end
   end
 
   it 'fails with a bad secret' do

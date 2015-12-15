@@ -23,6 +23,13 @@ module Fernet
   #
   # Returns the fernet token as a string
   def self.generate(secret, message = '', opts = {})
+    # OpenSSL::Cipher loses all encoding informaion upon decoding ciphertext
+    # and everything comes out as ASCII. To prevent that, let's just explicitly
+    # convert input value to UTF-8 so we can assume the decrypted value will
+    # also be unicode.  This is not exactly a wonderful solution, but it's
+    # better than just returning ASCII with mangled unicode bytes in it.
+    message = message.encode(Encoding::UTF_8) if message
+
     Generator.new(opts.merge({secret: secret, message: message})).
       generate
   end

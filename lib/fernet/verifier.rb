@@ -35,7 +35,7 @@ module Fernet
 
     # Public: Returns the token's message
     def message
-      @token.message
+      @token.message.dup.force_encoding(Encoding::UTF_8)
     end
 
     # Deprecated: returns the token's message
