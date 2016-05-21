@@ -44,11 +44,11 @@ module Fernet
     #
     # Examples
     #
-    #   ciphertext, iv = Fernet::Encryption.encrypt(
-    #     message: 'this is a secret', key: encryption_key
+    #   message = Fernet::Encryption.encrypt(
+    #     ciphertext: ciphertext, key: encryption_key, iv: iv
     #   )
     #
-    # Returns a two-element array containing the ciphertext and the random IV
+    # Returns the message as a string
     def self.decrypt(opts)
       decipher = OpenSSL::Cipher.new('AES-128-CBC')
       decipher.decrypt
