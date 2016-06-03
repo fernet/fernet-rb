@@ -1,3 +1,4 @@
 [submodule "spec/fernet-spec"]
 	path = spec/fernet-spec
-	url = git://github.com/kr/fernet-spec.git
+	url = https://github.com/tknarr/fernet-spec.git
+	branch = enhance_aes
