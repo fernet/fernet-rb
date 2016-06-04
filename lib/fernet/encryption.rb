@@ -21,7 +21,9 @@ module Fernet
     #
     # Returns a two-element array containing the ciphertext and the random IV
     def self.encrypt(opts)
-      cipher = OpenSSL::Cipher.new('AES-128-CBC')
+      key_bits = opts[:key].bytesize * 8
+      cipher_selection = 'AES-' + key_bits.to_s + '-CBC'
+      cipher = OpenSSL::Cipher.new(cipher_selection)
       cipher.encrypt
       iv = opts[:iv] || cipher.random_iv
       cipher.iv  = iv
@@ -50,7 +52,9 @@ module Fernet
     #
     # Returns a two-element array containing the ciphertext and the random IV
     def self.decrypt(opts)
-      decipher = OpenSSL::Cipher.new('AES-128-CBC')
+      key_bits = opts[:key].bytesize * 8
+      cipher_selection = 'AES-' + key_bits.to_s + '-CBC'
+      decipher = OpenSSL::Cipher.new(cipher_selection)
       decipher.decrypt
       decipher.iv  = opts[:iv]
       decipher.key = opts[:key]
