@@ -11,10 +11,13 @@ require 'fernet/configuration'
 Fernet::Configuration.run
 
 module Fernet
+  # Determine AES key bits from base64-encoded secret length
+  KEYBITS_SELECT = { 44 => 128, 64 => 192, 88 => 256 }.freeze
+
   # Public: generates a fernet token
   #
-  # secret  - a base64 encoded, 32 byte string
-  # message - the message being secured in plain text
+  # secret   - a base64 encoded 32, 48 or 64 byte string
+  # message  - the message being secured in plain text
   #
   # Examples
   #
@@ -30,7 +33,8 @@ module Fernet
     # better than just returning ASCII with mangled unicode bytes in it.
     message = message.encode(Encoding::UTF_8) if message
 
-    Generator.new(opts.merge({secret: secret, message: message})).
+    key_bits = KEYBITS_SELECT[secret.bytesize] || 128
+    Generator.new(opts.merge({secret: secret, message: message, key_bits: key_bits})).
       generate
   end
 

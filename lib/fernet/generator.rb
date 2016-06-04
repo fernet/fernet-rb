@@ -12,13 +12,15 @@ module Fernet
     # Internal: Initializes a generator
     #
     # opts - a hash containing the following keys:
-    # * secret  - a string containing a secret, optionally Base64 encoded
-    # * message - the message
+    # * key_bits - number of bits in the AES key, defaults to 128
+    # * secret   - a string containing a secret, optionally Base64 encoded
+    # * message  - the message
     def initialize(opts)
-      @secret  = opts.fetch(:secret)
-      @message = opts[:message]
-      @iv      = opts[:iv]
-      @now     = opts[:now]
+      @key_bits = opts[:key_bits] || 128
+      @secret   = opts.fetch(:secret)
+      @message  = opts[:message]
+      @iv       = opts[:iv]
+      @now      = opts[:now]
     end
 
     # Internal: generates a secret token
@@ -40,17 +42,18 @@ module Fernet
     def generate
       yield self if block_given?
 
-      token = Token.generate(secret:  @secret,
-                             message: @message,
-                             iv:      @iv,
-                             now:     @now)
+      token = Token.generate(key_bits: @key_bits,
+                             secret:   @secret,
+                             message:  @message,
+                             iv:       @iv,
+                             now:      @now)
       token.to_s
     end
 
     # Public: string representation of this generator, masks secret to avoid
     #   leaks
     def inspect
-      "#<Fernet::Generator @secret=[masked] @message=#{@message.inspect}>"
+      "#<Fernet::Generator @key_bits=#{@key_bits} @secret=[masked] @message=#{@message.inspect}>"
     end
     alias to_s inspect
 

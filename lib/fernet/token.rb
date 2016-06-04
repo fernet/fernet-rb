@@ -12,6 +12,8 @@ module Fernet
 
     # Internal: the default token version
     DEFAULT_VERSION = 0x80.freeze
+    # Internet: mapping from key size to version byte
+    VALID_VERSIONS = { 128 => 0x80, 192 => 0xA0, 256 => 0xC0 }.freeze
     # Internal: max allowed clock skew for calculating TTL
     MAX_CLOCK_SKEW  = 60.freeze
 
@@ -26,7 +28,13 @@ module Fernet
     #                  Configuration.ttl
     def initialize(token, opts = {})
       @token       = token
-      @secret      = Secret.new(opts.fetch(:secret))
+      begin
+        version_byte = version
+      rescue
+        version_byte = DEFAULT_VERSION
+      end
+      key_bits, _ = VALID_VERSIONS.rassoc(version_byte) || [ 128, 0 ]
+      @secret      = Secret.new(opts.fetch(:secret), key_bits)
       @enforce_ttl = opts.fetch(:enforce_ttl) { Configuration.enforce_ttl }
       @ttl         = opts[:ttl] || Configuration.ttl
       @now         = opts[:now]
@@ -67,13 +75,15 @@ module Fernet
     # Internal: generates a Fernet Token
     #
     # opts - a hash containing
-    # * secret  - a string containing the secret, optionally base64 encoded
-    # * message - the message in plain text
+    # * secret   - a string containing the secret, optionally base64 encoded
+    # * message  - the message in plain text
+    # * key_bits - number of bits in the AES key
     def self.generate(opts)
       unless opts[:secret]
         raise ArgumentError, 'Secret not provided'
       end
-      secret = Secret.new(opts.fetch(:secret))
+      key_bits = opts[:key_bits] || 128
+      secret = Secret.new(opts.fetch(:secret), key_bits)
       encrypted_message, iv = Encryption.encrypt(
         key:     secret.encryption_key,
         message: opts[:message],
@@ -81,13 +91,37 @@ module Fernet
       )
       issued_timestamp = (opts[:now] || Time.now).to_i
 
-      version = opts[:version] || DEFAULT_VERSION
+      version = opts[:version] || VALID_VERSIONS[key_bits] || DEFAULT_VERSION
       payload = [version].pack("C") +
         BitPacking.pack_int64_bigendian(issued_timestamp) +
         iv +
         encrypted_message
       mac = OpenSSL::HMAC.digest('sha256', secret.signing_key, payload)
       new(Base64.urlsafe_encode64(payload + mac), secret: opts.fetch(:secret))
+    end
+
+    # Internal: return the AES key length in bits based on a version byte
+    #
+    # v - version byte
+    def self.version_key_bits(v)
+      (VALID_VERSIONS.rassoc(v) || [ 0, 0 ])[0]
+    end
+
+    # Internal: return the revision of the spec based on a version byte
+    #
+    # v - version byte
+    def self.version_revision(v)
+      v & 0b00011111
+    end
+
+    # Internal: build a version byte based on a revision and AES key length
+    #
+    # key_bits - number of bits in the AES key
+    # revision - revision of the spec
+    def self.make_version(key_bits, revision)
+      base_version = VALID_VERSIONS[key_bits]
+      return 0 if base_version.nil?
+      ( base_version & 0b11100000 ) | ( revision & 0b00011111 )
     end
 
   private
@@ -176,7 +210,7 @@ module Fernet
     end
 
     def unknown_token_version?
-      DEFAULT_VERSION != version
+      VALID_VERSIONS.rassoc(version).nil?
     end
 
     def enforce_ttl?

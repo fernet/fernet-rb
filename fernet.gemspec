@@ -2,9 +2,9 @@
 require File.expand_path('../lib/fernet/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors      = ["Harold Giménez"]
-  gem.email        = ["harold.gimenez@gmail.com"]
-  gem.description  = "Delicious HMAC Digest(if) authentication and AES-128-CBC encryption"
+  gem.authors      = ["Harold Giménez", "Todd Knarr"]
+  gem.email        = ["harold.gimenez@gmail.com", "tknarr@silverglass.org"]
+  gem.description  = "Delicious HMAC Digest(if) authentication and AES-128/192/256-CBC encryption"
   gem.summary      = "Easily generate and verify AES encrypted HMAC based authentication tokens"
   gem.homepage     = "https://github.com/fernet/fernet-rb"
 
