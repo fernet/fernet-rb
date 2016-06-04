@@ -100,6 +100,30 @@ module Fernet
       new(Base64.urlsafe_encode64(payload + mac), secret: opts.fetch(:secret))
     end
 
+    # Internal: return the AES key length in bits based on a version byte
+    #
+    # v - version byte
+    def self.version_key_bits(v)
+      (VALID_VERSIONS.rassoc(v) || [ 0, 0 ])[0]
+    end
+
+    # Internal: return the revision of the spec based on a version byte
+    #
+    # v - version byte
+    def self.version_revision(v)
+      v & 0b00011111
+    end
+
+    # Internal: build a version byte based on a revision and AES key length
+    #
+    # key_bits - number of bits in the AES key
+    # revision - revision of the spec
+    def self.make_version(key_bits, revision)
+      base_version = VALID_VERSIONS[key_bits]
+      return 0 if base_version.nil?
+      ( base_version & 0b11100000 ) | ( revision & 0b00011111 )
+    end
+
   private
     def decoded_token
       @decoded_token ||= Base64.urlsafe_decode64(@token)

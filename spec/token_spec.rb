@@ -131,4 +131,47 @@ describe Fernet::Token, 'message' do
 
     expect(token.message).to eq('')
   end
+
+  it 'correctly returns the key length for a version' do
+    key_bits = Fernet::Token.version_key_bits(0x80)
+    expect(key_bits).to eq(128)
+
+    key_bits = Fernet::Token.version_key_bits(0xA0)
+    expect(key_bits).to eq(192)
+
+    key_bits = Fernet::Token.version_key_bits(0xC0)
+    expect(key_bits).to eq(256)
+  end
+
+  it 'correctly handles key length for invalid versions' do
+    key_bits = Fernet::Token.version_key_bits(0x90)
+    expect(key_bits).to eq(0)
+  end
+
+  it 'correctly returns the spec revision' do
+    rev = Fernet::Token.version_revision(0x80)
+    expect(rev).to eq(0)
+
+    rev = Fernet::Token.version_revision(0xA0)
+    expect(rev).to eq(0)
+
+    rev = Fernet::Token.version_revision(0xC0)
+    expect(rev).to eq(0)
+  end
+
+  it 'correctly builds a version byte' do
+    v = Fernet::Token.make_version(128, 0)
+    expect(v).to eq(0x80)
+
+    v = Fernet::Token.make_version(192, 0)
+    expect(v).to eq(0xA0)
+
+    v = Fernet::Token.make_version(256, 0)
+    expect(v).to eq(0xC0)
+  end
+
+  it 'correctly builds a version byte for an invalid key length' do
+    v = Fernet::Token.make_version(150, 7)
+    expect(v).to eq(0)
+  end
 end
