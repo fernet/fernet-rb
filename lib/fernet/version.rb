@@ -1,3 +1,3 @@
 module Fernet
-  VERSION = "2.2"
+  VERSION = "3.0.pre1"
 end
