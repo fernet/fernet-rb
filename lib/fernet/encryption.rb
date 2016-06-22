@@ -5,7 +5,7 @@ module Fernet
   module Encryption
     AES_BLOCK_SIZE  = 16.freeze
 
-    # Internal: Encrypts the provided message using a AES-128-CBC cipher with a
+    # Internal: Encrypts the provided message using a AES-128-GCM cipher with a
     #   random IV and the provided encryption key
     #
     # opts - a hash containing
@@ -21,7 +21,7 @@ module Fernet
     #
     # Returns a two-element array containing the ciphertext and the random IV
     def self.encrypt(opts)
-      cipher = OpenSSL::Cipher.new('AES-128-CBC')
+      cipher = OpenSSL::Cipher.new('aes-128-gcm')
       cipher.encrypt
       iv = opts[:iv] || cipher.random_iv
       cipher.iv  = iv
@@ -34,7 +34,7 @@ module Fernet
       [ciphertext, iv]
     end
 
-    # Internal: Decrypts the provided ciphertext using a AES-128-CBC cipher with a
+    # Internal: Decrypts the provided ciphertext using a AES-128-GCM cipher with a
     #   the provided IV and encryption key
     #
     # opts - a hash containing
@@ -50,7 +50,7 @@ module Fernet
     #
     # Returns a two-element array containing the ciphertext and the random IV
     def self.decrypt(opts)
-      decipher = OpenSSL::Cipher.new('AES-128-CBC')
+      decipher = OpenSSL::Cipher.new('aes-128-gcm')
       decipher.decrypt
       decipher.iv  = opts[:iv]
       decipher.key = opts[:key]
