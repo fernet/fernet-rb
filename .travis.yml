@@ -6,7 +6,7 @@ rvm:
   - 2.0
   - 2.1
   - 2.2
-  - 2.3
+  - 2.3.1
 
 # install fresh version of bundler, since older ones blow up trying to install
 # rspec
