@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.require_path = "lib"
   gem.version      = Fernet::VERSION
 
-  gem.add_runtime_dependency     "valcro", "0.1"
+  gem.add_runtime_dependency     "valcro", "~> 0.1"
   gem.add_development_dependency "rspec",  "~> 3.4"
   gem.add_development_dependency "rake",  "~> 10.4"
 end
