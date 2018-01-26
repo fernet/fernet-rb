@@ -85,4 +85,13 @@ describe Fernet do
     expect(verifier).to be_valid
     expect(verifier.message).to eq('harold@heroku.com')
   end
+
+  it 'accepts multiple secrets in an array to verify' do
+    token = Fernet.generate(secret, 'harold@heroku.com')
+
+    verifier = Fernet.verifier([bad_secret, secret], token)
+
+    expect(verifier).to be_valid
+    expect(verifier.message).to eq('harold@heroku.com')
+  end
 end

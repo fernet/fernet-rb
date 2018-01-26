@@ -64,7 +64,7 @@ module Fernet
 
   private
     def create_token!
-      secrets = [@opts.fetch(:secret)] + @opts.fetch(:additional_secrets, [])
+      secrets = Array(@opts.fetch(:secret)) + @opts.fetch(:additional_secrets, [])
       secret = secrets.find do |secret|
         Token.new(@opts.fetch(:token),
                   secret: secret,
