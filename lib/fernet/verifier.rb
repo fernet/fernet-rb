@@ -65,11 +65,16 @@ module Fernet
   private
     def create_token!
       secrets = Array(@opts.fetch(:secret)) + @opts.fetch(:additional_secrets, [])
-      secret = secrets.find do |secret|
-        Token.new(@opts.fetch(:token),
-                  secret: secret,
-                  enforce_ttl: false).valid?
+      if secrets.length > 1
+        secret = secrets.find do |secret|
+          Token.new(@opts.fetch(:token),
+                    secret: secret,
+                    enforce_ttl: false).valid?
+        end
+      else
+        secret = secrets.first
       end
+
       @token = Token.new(@opts.fetch(:token),
                          secret: secret || @opts.fetch(:secret),
                          enforce_ttl: enforce_ttl,
