@@ -49,6 +49,9 @@ The verifier is valid if:
 Otherwise, `verified` will be false, and you should deny the request with an
 HTTP 401, for example.
 
+Additional secrets can be provided, and the verifier will try each of these in
+turn.
+
 The specs
 ([spec/fernet_spec.rb](https://github.com/hgmnz/fernet/blob/master/spec/fernet_spec.rb))
 have more usage examples.

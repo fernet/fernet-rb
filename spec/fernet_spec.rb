@@ -76,4 +76,33 @@ describe Fernet do
     expect(verifier.valid?).to eq(true)
     expect(verifier.message).to eq('password1')
   end
+
+  it 'verifies the token using one of several supplied keys' do
+    token = Fernet.generate(secret, 'harold@heroku.com')
+
+    verifier = Fernet.verifier(bad_secret, token, additional_secrets: [secret])
+
+    expect(verifier).to be_valid
+    expect(verifier.message).to eq('harold@heroku.com')
+  end
+
+  it 'ignores nil values as additional secrets' do
+    token = Fernet.generate(secret, 'harold@heroku.com')
+
+    verifier = Fernet.verifier(bad_secret, token, additional_secrets: [nil])
+
+    expect(verifier.valid?).to eq(false)
+    expect {
+      verifier.message
+    }.to raise_error Fernet::Token::InvalidToken
+  end
+
+  it 'accepts multiple secrets in an array to verify' do
+    token = Fernet.generate(secret, 'harold@heroku.com')
+
+    verifier = Fernet.verifier([bad_secret, secret], token)
+
+    expect(verifier).to be_valid
+    expect(verifier.message).to eq('harold@heroku.com')
+  end
 end

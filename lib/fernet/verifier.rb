@@ -15,10 +15,13 @@ module Fernet
     # Internal: initializes a Verifier
     #
     # opts - a hash containing
-    # * secret      - the secret used to create the token (required)
-    # * token       - the fernet token string (required)
-    # * enforce_ttl - whether to enforce TTL, defaults to Configuration.enforce_ttl
-    # * ttl         - number of seconds the token is valid
+    # * secret             - the secret used to create the token (required) - can be an array of secrets
+    # * token              - the fernet token string (required)
+    # * enforce_ttl        - whether to enforce TTL, defaults to Configuration.enforce_ttl
+    # * ttl                - number of seconds the token is valid
+    # * additional_secrets - additional secrets which can be used to decrypt
+    #                        the token, useful for credrolls when changing the
+    #                        secret.
     def initialize(opts = {})
       @enforce_ttl = opts.has_key?(:enforce_ttl) ? opts[:enforce_ttl] : Configuration.enforce_ttl
       @opts = opts
@@ -61,11 +64,22 @@ module Fernet
 
   private
     def create_token!
+      secrets = (Array(@opts.fetch(:secret)) + @opts.fetch(:additional_secrets, [])).compact
+      if secrets.length > 1
+        secret = secrets.find do |secret|
+          Token.new(@opts.fetch(:token),
+                    secret: secret,
+                    enforce_ttl: false).valid?
+        end
+      else
+        secret = secrets.first
+      end
+
       @token = Token.new(@opts.fetch(:token),
-                           secret: @opts.fetch(:secret),
-                           enforce_ttl: enforce_ttl,
-                           ttl: @opts[:ttl],
-                           now: @opts[:now])
+                         secret: secret || @opts.fetch(:secret),
+                         enforce_ttl: enforce_ttl,
+                         ttl: @opts[:ttl],
+                         now: @opts[:now])
     end
   end
 end
