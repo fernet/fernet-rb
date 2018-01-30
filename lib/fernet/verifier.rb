@@ -15,7 +15,7 @@ module Fernet
     # Internal: initializes a Verifier
     #
     # opts - a hash containing
-    # * secret             - the secret used to create the token (required)
+    # * secret             - the secret used to create the token (required) - can be an array of secrets
     # * token              - the fernet token string (required)
     # * enforce_ttl        - whether to enforce TTL, defaults to Configuration.enforce_ttl
     # * ttl                - number of seconds the token is valid
@@ -64,7 +64,7 @@ module Fernet
 
   private
     def create_token!
-      secrets = Array(@opts.fetch(:secret)) + @opts.fetch(:additional_secrets, [])
+      secrets = (Array(@opts.fetch(:secret)) + @opts.fetch(:additional_secrets, [])).compact
       if secrets.length > 1
         secret = secrets.find do |secret|
           Token.new(@opts.fetch(:token),

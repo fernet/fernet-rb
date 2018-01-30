@@ -36,11 +36,15 @@ module Fernet
 
   # Public: verifies a fernet token
   #
-  # secret - the secret used to generate the token
+  # secret - the secret used to generate the token - can be an array of secrets,
+  #          each of which will be tested and the first that succeeds will be
+  #          used to decrypt the token
   # token  - the token to verify as a string
   # opts   - an optional hash containing
   # * enforce_ttl - whether to enforce TTL in this verification
   # * ttl         - number of seconds token is valid
+  # additional_secrets - additional secrets which can be used to decrypt the token
+  #                      useful for credrolls when changing the secret
   #
   # Both enforce_ttl and ttl can be configured globally via Configuration
   #
